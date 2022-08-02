@@ -199,7 +199,6 @@ object Main {
     for (states <- locations) {
       val deleteArray = Array(s"results/${states(1)}geo.csv", s"${states(1)}00001.upl", s"${states(1)}00002.upl", s"${states(1)}geo.upl")
       for (files <- deleteArray) {
-        println(files)
         new File(files).delete()
       }
     }
