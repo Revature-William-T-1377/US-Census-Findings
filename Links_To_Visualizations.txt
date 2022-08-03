@@ -1,11 +1,10 @@
-total pop: https://public.tableau.com/views/TotalPopulationAcrosstheDecades/Sheet1?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link
+1. --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Total Pop: https://public.tableau.com/views/TotalPopulationAcrosstheDecades/Sheet1?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link
 
-pop prediction 2020: https://public.tableau.com/views/2020PopulationPrediction/Sheet3?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link
+Pop Prediction 2020: https://public.tableau.com/views/2020PopulationPrediction/Sheet3?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link
 
-fastest growing states: https://public.tableau.com/views/FastestGrowingStates_16595440232810/Sheet4?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+Fastest Growing States: https://public.tableau.com/views/FastestGrowingStates_16595440232810/Sheet4?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link
+2. --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Decade Population Change: https://public.tableau.com/app/profile/jordi.ictech/viz/DecadePopulationChange/Sheet1?publish=yes
 
 Population Growth Rate 2000-2020 Map: https://public.tableau.com/app/profile/jordi.ictech/viz/PopulationGrowthRate2000-2020/Sheet1?publish=yes
@@ -15,5 +14,4 @@ Population Growth 2000-2020 Bars: https://public.tableau.com/app/profile/jordi.i
 2010 and 2020 Growth
 Trendline: https://public.tableau.com/app/profile/jordi.ictech/viz/GrowthTrendlines/Sheet1?publish=yes
 Bar Graph: https://public.tableau.com/app/profile/jordi.ictech/viz/GrowthBars/Sheet1?publish=yes
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+3. --------------------------------------------------------------------------------------------------------------------------------------------------------------------
