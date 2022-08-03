@@ -72,7 +72,7 @@ object sparkQueries extends App {
     //val csvname = "Combine2010RG.csv"
     //val csvname = "Combine2020RG.csv"
 
-    // path to test data in project test bucket (AWS S3)
+    // path to test data in project bucket (AWS S3)
     val urlfile = s"https://revature-william-big-data-1377.s3.amazonaws.com/csvraw/$csvname"
     spark.sparkContext.addFile(urlfile)
 
@@ -80,7 +80,7 @@ object sparkQueries extends App {
     val dataframe = spark
       .read
       //.schema(schema)
-      .format("csv") // may specify csv here
+      .format("csv")
       .option("header", "true")
       .load("file://" + SparkFiles.get(s"$csvname")) // match filename with urlfile
 
