@@ -108,6 +108,12 @@ object sparkQueries extends App {
 
     dataframe.show()
 
+
+      //second method for getting from bucket
+    val bucket = "revature-william-big-data-1377"
+    val df = spark.read.format("csv").option("header", "true").load(s"s3a://$bucket/csvraw/Combine2020RG.csv") // File location in hdfs
+    df.show()
+
   }
 
   exampleQuery()
