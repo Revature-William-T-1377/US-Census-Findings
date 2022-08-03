@@ -5,11 +5,29 @@ import org.apache.spark.sql.SparkSession
 import scala.language.postfixOps
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
+import scala.io.{BufferedSource, Source}
+
 object sparkQueries extends App {
   val spark: SparkSession = sparkCxn()
 
   def sparkCxn(): SparkSession = {
 
+    val bucket = "revature-william-big-data-1377"
+
+    var accessKey = " "
+    var secretKey = " "
+    val bufferedSource: BufferedSource = Source.fromFile("C:\\Resources\\rootkeyP3.csv")
+    var count = 0
+    for (line <- bufferedSource.getLines) {
+      val Array(val1, value) = line.split("=").map(_.trim)
+      count match {
+        case 0 => accessKey = value
+        case 1 => secretKey = value
+      }
+      count = count + 1
+    }
+
+    //System.setProperty("hadoop.home.dir", "C:\\hadoop3")
     val spark = SparkSession
       .builder
       .appName("Spark Queries")
@@ -17,6 +35,10 @@ object sparkQueries extends App {
       //.config("spark.master", "local[*]")   // possibly use for remote master connection
       .config("spark.driver.allowMultipleContexts", "true")
       .enableHiveSupport()
+      .config("spark.hadoop.fs.s3a.access.key", accessKey)
+      .config("spark.hadoop.fs.s3a.secret.key", secretKey)
+      .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+      .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider")
       .getOrCreate()
     Logger.getLogger("org").setLevel(Level.WARN)
     Logger.getLogger("akka").setLevel(Level.WARN)
