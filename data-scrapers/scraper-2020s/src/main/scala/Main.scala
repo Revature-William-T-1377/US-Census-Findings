@@ -85,7 +85,6 @@ object Main {
 
     var counter = 1
     //downloads zip files from 2000 census data, unzips files
-    /*
     for (i <- locations) {
       val state = i(0)
       val abbreviation = i(1)
@@ -100,7 +99,7 @@ object Main {
       unzip("datasets/2020.zip")
       println(counter.toString + "/" + locations.length)
       counter = counter + 1
-    }*/
+    }
 
     //sets up field names for 00001.csv and 00002.csv
     val file1Name = "tableFiles/Segment1.csv"
