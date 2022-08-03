@@ -1,0 +1,77 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%logger] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>.logs/dot.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%logger] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>.logs/dot.log</file>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%logger] %msg%n</pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>.logs/archived/dot.%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <root level="DEBUG">
+        <!-- you can enable both CONSOLE and FILE-->
+        <!--<appender-ref ref="CONSOLE" />-->
+        <appender-ref ref="FILE-ROLLING"/>
+    </root>
+
+    <logger name="io.grpc.netty.NettyClientHandler">
+        <level value="INFO"/>
+        <appender-ref ref="FILE-ROLLING"/>
+    </logger>
+
+    <logger name="org.apache.kafka">
+        <level value="WARN"/>
+        <appender-ref ref="FILE-ROLLING"/>
+    </logger>
+
+    <logger name="akka.kafka">
+        <level value="WARN"/>
+        <appender-ref ref="FILE-ROLLING"/>
+    </logger>
+
+    <logger name="com.datastax.driver.core.Session">
+        <level value="ERROR"/>
+        <appender-ref ref="FILE-ROLLING"/>
+    </logger>
+
+    <logger name="com.datastax.driver.core.Connection">
+        <level value="ERROR"/>
+        <appender-ref ref="FILE-ROLLING"/>
+    </logger>
+
+    <logger name="com.datastax.driver.core.RequestHandler">
+        <level value="ERROR"/>
+        <appender-ref ref="FILE-ROLLING"/>
+    </logger>
+
+    <logger name="com.datastax.driver.core.Cluster">
+        <level value="ERROR"/>
+        <appender-ref ref="FILE-ROLLING"/>
+    </logger>
+
+    <logger name="io.netty">
+        <level value="OFF"/>
+    </logger>
+
+</configuration>
