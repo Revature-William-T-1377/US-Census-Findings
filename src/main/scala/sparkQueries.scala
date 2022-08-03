@@ -42,7 +42,7 @@ object sparkQueries extends App {
   val urlfile = "https://revature-william-big-data-1377.s3.amazonaws.com/testfolder/test.json"
   spark.sparkContext.addFile(urlfile)
 
-  // dataframe to read json
+  // create dataframe to read json
   var dataframe = spark
     .read
     .schema(schema)
