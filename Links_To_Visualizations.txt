@@ -11,3 +11,9 @@ Decade Population Change: https://public.tableau.com/app/profile/jordi.ictech/vi
 Population Growth Rate 2000-2020 Map: https://public.tableau.com/app/profile/jordi.ictech/viz/PopulationGrowthRate2000-2020/Sheet1?publish=yes
 
 Population Growth 2000-2020 Bars: https://public.tableau.com/app/profile/jordi.ictech/viz/PopulationGrowth2000-2020Bars/Sheet1?publish=yes
+
+2010 and 2020 Growth
+Trendline: https://public.tableau.com/app/profile/jordi.ictech/viz/GrowthTrendlines/Sheet1?publish=yes
+Bar Graph: https://public.tableau.com/app/profile/jordi.ictech/viz/GrowthBars/Sheet1?publish=yes
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
