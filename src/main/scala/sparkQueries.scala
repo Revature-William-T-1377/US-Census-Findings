@@ -27,29 +27,33 @@ object sparkQueries extends App {
     spark
   }
 
-  // define schema structure; column names based on json data
-  val schema = StructType(
-    Array(
-      StructField("KEY", StringType, nullable = false),
-      StructField("COLUMN1", StringType, nullable = false),
-      StructField("COLUMN2", StringType, nullable = false),
-      StructField("COLUMN3", StringType, nullable = false)
+  def testQuery(): Unit = {
+    // define schema structure; column names based on json data
+    val schema = StructType(
+      Array(
+        StructField("KEY", StringType, nullable = false),
+        StructField("COLUMN1", StringType, nullable = false),
+        StructField("COLUMN2", StringType, nullable = false),
+        StructField("COLUMN3", StringType, nullable = false)
+      )
+
     )
 
-  )
+    // path to test data in project test bucket (AWS S3)
+    val urlfile = "https://revature-william-big-data-1377.s3.amazonaws.com/testfolder/test.json"
+    spark.sparkContext.addFile(urlfile)
 
-  // path to test data in project test bucket (AWS S3)
-  val urlfile = "https://revature-william-big-data-1377.s3.amazonaws.com/testfolder/test.json"
-  spark.sparkContext.addFile(urlfile)
+    // create dataframe to read json
+    val dataframe = spark
+      .read
+      .schema(schema)
+      .format("json") // may specify csv here
+      .option("header", "true")
+      .load("file://" + SparkFiles.get("test.json")) // match filename with urlfile
 
-  // create dataframe to read json
-  var dataframe = spark
-    .read
-    .schema(schema)
-    .format("json")   // may specify csv here
-    .option("header", "true")
-    .load("file://" + SparkFiles.get("test.json"))    // match filename with urlfile
+    dataframe.show()
+  }
 
-  dataframe.show()
+  testQuery()
 
 }
