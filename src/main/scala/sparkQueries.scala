@@ -54,6 +54,40 @@ object sparkQueries extends App {
     dataframe.show()
   }
 
-  testQuery()
+  //testQuery()
+
+  def exampleQuery(): Unit = {
+     // define schema structure; column names based on data columns
+    val schema = StructType(
+      Array(
+        StructField("KEY", StringType, nullable = false),
+        StructField("COLUMN1", StringType, nullable = false),
+        StructField("COLUMN2", StringType, nullable = false),
+        StructField("COLUMN3", StringType, nullable = false)
+      )
+
+    )
+
+    val csvname = "Combine2000RG.csv"
+    //val csvname = "Combine2010RG.csv"
+    //val csvname = "Combine2020RG.csv"
+
+    // path to test data in project test bucket (AWS S3)
+    val urlfile = s"https://revature-william-big-data-1377.s3.amazonaws.com/csvraw/$csvname"
+    spark.sparkContext.addFile(urlfile)
+
+    // create dataframe to read json
+    val dataframe = spark
+      .read
+      //.schema(schema)
+      .format("csv") // may specify csv here
+      .option("header", "true")
+      .load("file://" + SparkFiles.get(s"$csvname")) // match filename with urlfile
+
+    dataframe.show()
+
+  }
+
+  exampleQuery()
 
 }
