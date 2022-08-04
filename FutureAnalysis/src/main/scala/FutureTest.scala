@@ -4,7 +4,7 @@ object FutureTest {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession
       .builder
-      .appName("PokemonMoves")
+      .appName("FutureTest")
       .config("spark.master", "local[*]")
       .enableHiveSupport()
       .getOrCreate()
