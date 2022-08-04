@@ -7,3 +7,6 @@ fastest growing states https://public.tableau.com/views/FastestGrowingStates_165
 Decreasing population https://public.tableau.com/app/profile/sevin.hawkins/viz/DecreasingPop/Sheet1?publish=yes
 
 Highest population per region https://public.tableau.com/app/profile/walter.pena/viz/HighestPopulationperRegion/Sheet6?publish=yes
+
+Fastest growth by region
+https://public.tableau.com/app/profile/sevin.hawkins/viz/Fastestgrowthbyregion/Sheet1?publish=yes
