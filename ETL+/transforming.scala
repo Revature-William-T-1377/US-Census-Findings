@@ -15,76 +15,62 @@ object transforming extends App{
   Logger.getLogger("org").setLevel(Level.ERROR)
   println("Created spark session.")
 
-  //println("df1")
-  //val df1 = spark.read.format("csv").option("header", "true").load("D:\\Revature\\DowloadDataScala\\CSVs\\co00001.csv") // s"s3a://$bucket/time_series_covid_19_confirmed.csv
-  //df1.createOrReplaceTempView("Co1Imp")
-
-//  df1.write.mode("overwrite").saveAsTable("Co1")
-//  spark.sql("SELECT * FROM Co1").show()
-
-  //println("df2")
-  //val df2 = spark.read.format("csv").option("header", "true").load("D:\\Revature\\DowloadDataScala\\CSVs\\co00002.csv") // s"s3a://$bucket/time_series_covid_19_confirmed.csv
-  //df2.createOrReplaceTempView("Co2Imp")
-
-  //println("df3")
-  //val df3 = spark.read.format("csv").option("header", "true").load("D:\\Revature\\DowloadDataScala\\CSVs\\ak00001.csv") // s"s3a://$bucket/time_series_covid_19_confirmed.csv
-  //df3.createOrReplaceTempView("Ak1Imp")
-
-//  df2.write.mode("overwrite").saveAsTable("Co2")
-//  spark.sql("SELECT * FROM Co2").show()
-
-// ------------------------------------------------------Modifications--------------------------------------------------------------------------------
-/*
-  println("df2M")
-  var df2M = df2.drop("chariter", "cifsn", "fileid", "stusab", "LOGRECNO")
-  //df2M = df2M.withColumnd("LOGRECNO","LOGRECNO2")
-Rename
-  var df1M = df1.withColumn("id1", monotonically_increasing_id)  // Makes id column to join
-  df2M = df2M.withColumn("id2", monotonically_increasing_id)    // Then it will be dropped
-
-  df1M.createOrReplaceTempView("Co1ImpM")
-  df1M.show()
-
-  df2M.createOrReplaceTempView("Co2ImpM")
-  df2M.show()
-
-  var export1 = df1M.join(df2M,col("id1")===col("id2"),"inner") //Joines with id column then drops it.
-    .drop("id1","id2")
-
-  file.outputcsv("CoCombine1",export1)
-  export1.show()
-*/
   val statelist = List("ak", "az", "ar", "ca", "co", "ct", "de", "dc", "fl", "ga", "hi", "id", "il", "in", "ia", "ks", "ky",
   "la", "me", "md", "ma", "mi", "mn", "ms", "mo", "mt", "ne", "nv", "nh", "nj", "nm", "ny", "nc", "nd", "oh", "ok", "or",
   "pa", "pr", "ri", "sc", "sd", "tn", "tx", "ut", "vt", "va", "wa", "wv", "wi", "wy")
 
   var com1: DataFrame = _
+  var com2: DataFrame = _
+  var com3: DataFrame = _
 
-  println("dfC1")
-  var dfC1 = spark.read.format("csv").option("header", "true").load(s"D:\\Revature\\DowloadDataScala\\CSVs3\\al00001.csv") // s"s3a://$bucket/time_series_covid_19_confirmed.csv
+  var dfC1 = spark.read.format("csv").option("header", "true").load(s"D:\\Revature\\DowloadDataScala\\CSVs\\CSVs1\\al00001.csv")
   dfC1.createOrReplaceTempView("Df1Imp")
   var dfCL1 = spark.sql("SELECT * FROM Df1Imp LIMIT 1")
 
-  statelist.foreach( i => { println(i)
+  var dfC2 = spark.read.format("csv").option("header", "true").load(s"D:\\Revature\\DowloadDataScala\\CSVs\\CSVs2\\al000012010.csv")
+  dfC2.createOrReplaceTempView("Df2Imp")
+  var dfCL2 = spark.sql("SELECT * FROM Df2Imp LIMIT 1")
 
-    //  df1.write.mode("overwrite").saveAsTable("Co1")
-    //  spark.sql("SELECT * FROM Co1").show()
+  var dfC3 = spark.read.format("csv").option("header", "true").load(s"D:\\Revature\\DowloadDataScala\\CSVs\\CSVs3\\al00001.csv")
+  dfC3.createOrReplaceTempView("Df3Imp")
+  var dfCL3 = spark.sql("SELECT * FROM Df3Imp LIMIT 1")
 
-    println("dfC2")
-    var dfC2 = spark.read.format("csv").option("header", "true").load(s"D:\\Revature\\DowloadDataScala\\CSVs3\\${i}00001.csv") // s"s3a://$bucket/time_series_covid_19_confirmed.csv
-    dfC2.createOrReplaceTempView("Df2Imp")
+  statelist.foreach( i => {
 
-    var dfCL2 = spark.sql("SELECT * FROM Df2Imp LIMIT 1")
+    var dfC1 = spark.read.format("csv").option("header", "true").load(s"D:\\Revature\\DowloadDataScala\\CSVs\\CSVs1\\${i}00001.csv")
+    dfC1.createOrReplaceTempView("Df1Imp")
 
-    var com1 = dfCL1.union(dfCL2).distinct() //unionByName().distinct()
+    var dfCL1M = spark.sql("SELECT * FROM Df1Imp LIMIT 1")
+
+    var com1 = dfCL1.union(dfCL1M).distinct()
     dfCL1 = com1
-    //dfCL1.show()
   })
 
-  file.outputcsv("Combine2020", dfCL1)
+  statelist.foreach( i => {
 
-  spark.sql("SHOW DATABASES").show()
-  spark.sql("SHOW TABLES").show()
+    var dfC2 = spark.read.format("csv").option("header", "true").load(s"D:\\Revature\\DowloadDataScala\\CSVs\\CSVs2\\${i}000012010.csv")
+    dfC2.createOrReplaceTempView("Df2Imp")
+
+    var dfCL2M = spark.sql("SELECT * FROM Df2Imp LIMIT 1")
+
+    var com2 = dfCL2.union(dfCL2M).distinct()
+    dfCL2 = com2
+  })
+
+  statelist.foreach( i => {
+
+    var dfC3 = spark.read.format("csv").option("header", "true").load(s"D:\\Revature\\DowloadDataScala\\CSVs\\CSVs3\\${i}00001.csv")
+    dfC3.createOrReplaceTempView("Df3Imp")
+
+    var dfCL3M = spark.sql("SELECT * FROM Df3Imp LIMIT 1")
+
+    var com3 = dfCL3.union(dfCL3M).distinct()
+    dfCL3 = com3
+  })
+
+  dfCL1.coalesce(1).write.option("header", "true").csv("D:\\Revature\\DowloadDataScala\\FinalExport\\OutputCSV2\\2000")
+  dfCL2.coalesce(1).write.option("header", "true").csv("D:\\Revature\\DowloadDataScala\\FinalExport\\OutputCSV2\\2010")
+  dfCL3.coalesce(1).write.option("header", "true").csv("D:\\Revature\\DowloadDataScala\\FinalExport\\OutputCSV2\\2020")
 
   val duration = (System.nanoTime - t1)
   println("Code Lasted: " + (duration/1000000000) + " Seconds")
