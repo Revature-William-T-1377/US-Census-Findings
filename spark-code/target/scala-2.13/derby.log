@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Mon Jul 25 22:08:07 CDT 2022:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0182-3879-e102-00000b710720 
+on database directory /mnt/c/Users/wolf1/Documents/IntelliJ/CovidP2/CovidAnalysis/target/scala-2.13/metastore_db with class loader org.apache.spark.sql.hive.client.IsolatedClientLoader$$anon$1@2b85edc7 
+Loaded from file:/opt/spark/jars/derby-10.12.1.1.jar
+java.vendor=Private Build
+java.runtime.version=1.8.0_312-8u312-b07-0ubuntu1~20.04-b07
+user.dir=/mnt/c/Users/wolf1/Documents/IntelliJ/CovidP2/CovidAnalysis/target/scala-2.13
+os.name=Linux
+os.arch=amd64
+os.version=5.10.16.3-microsoft-standard-WSL2
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
