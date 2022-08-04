@@ -1,0 +1,4 @@
+[warn] scala-library-2.13.8-sources.jar no longer exists at C:\Users\Fenix Xia\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala-library\2.13.8\scala-library-2.13.8-sources.jar
+[debug] not up to date. inChanged = false, force = false
+[debug] Updating ProjectRef(uri("file:/F:/Revature/zachs/queries/results/Project3draft/"), "root")...
+[debug] Done updating ProjectRef(uri("file:/F:/Revature/zachs/queries/results/Project3draft/"), "root")
