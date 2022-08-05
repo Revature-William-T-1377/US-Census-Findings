@@ -29,7 +29,7 @@ object file {
 
   def outputcsv(name : String,newData:DataFrame): Unit =  {
 
-    val outputfile = "D:\\Revature\\DowloadDataScala\\FinalExport\\OutputCSV2"
+    val outputfile = ".\\OutputCSV2"
     var filename = name + ".csv"
     var outputFileName = outputfile + "/temp_" + filename
     var mergedFileName = outputfile + "/" + filename//merged_

@@ -1,17 +1,17 @@
 package etl
 
-import scala.language.postfixOps
-import sys.process._
+import java.io._
 import java.net.URL
-import java.io.{BufferedWriter, File, FileInputStream, FileOutputStream, FileWriter, InputStream, PrintWriter}
+import java.nio.file.{Files, Paths}
 import java.util.zip.ZipInputStream
 import scala.io.Source
-import util.Try
+import scala.language.postfixOps
+import scala.sys.process._
 
-object Main {
+object andyCombinedScrapper {
   //Downloads a file given some url and file name
   def fileDownload(url: String, fileName: String) = {
-    new URL(url) #> new File("src/main/scala/queries/", fileName) !!
+    new URL(url) #> new File(fileName) !!
   }
 
   //Unzips zip files
@@ -38,7 +38,7 @@ object Main {
       }
 
       fileDownload(url, "2020.zip")
-      unzip("src/main/scala/queries/2020.zip")
+      unzip("2020.zip")
       println(counter.toString + "/" + locations.length)
       counter = counter + 1
     }
@@ -75,7 +75,7 @@ object Main {
       } else {
         pl1Name = s"${states(1)}000012020.pl"
       }
-      val writer1 = new BufferedWriter(new FileWriter(new File("datasets/2020/", file1Name), true))
+      val writer1 = new BufferedWriter(new FileWriter(new File("./datasets/2020/", file1Name), true))
       writer1.write(fields1 + "\n")
       for (lines <- Source.fromFile(pl1Name)("iso-8859-1").getLines()) {
         val tmp = lines
@@ -93,7 +93,7 @@ object Main {
       } else {
         pl2Name = s"${states(1)}000022020.pl"
       }
-      val writer2 = new BufferedWriter(new FileWriter(new File("datasets/2020/", file2Name), true))
+      val writer2 = new BufferedWriter(new FileWriter(new File("./datasets/2020/", file2Name), true))
       writer2.write(fields1 + "\n")
       for (lines <- Source.fromFile(pl2Name)("iso-8859-1").getLines()) {
         val tmp = lines
@@ -111,7 +111,7 @@ object Main {
       } else {
         pl3Name = s"${states(1)}000032020.pl"
       }
-      val writer3 = new BufferedWriter(new FileWriter(new File("datasets/2020/", file3Name), true))
+      val writer3 = new BufferedWriter(new FileWriter(new File("./datasets/2020/", file3Name), true))
       writer3.write(fields3 + "\n")
       for (lines <- Source.fromFile(pl3Name)("iso-8859-1").getLines()) {
         val tmp = lines
@@ -129,7 +129,7 @@ object Main {
       } else {
         pl4Name = s"${states(1)}geo2020.pl"
       }
-      val writer4 = new BufferedWriter(new FileWriter(new File("datasets/2020/", file4Name), true))
+      val writer4 = new BufferedWriter(new FileWriter(new File("./datasets/2020/", file4Name), true))
       writer4.write(fields4 + "\n")
       for (lines <- Source.fromFile(pl4Name)("iso-8859-1").getLines()) {
         val tmp = lines
@@ -143,6 +143,7 @@ object Main {
   } // finished
 
   def extract2010(locations: Array[Array[String]]): Unit = {
+
     var counter = 1
     for (i <- locations) {
       val state = i(0)
@@ -157,7 +158,7 @@ object Main {
 
       fileDownload(url1, "1.zip")
 
-      unzip("datasets/1.zip")
+      unzip("1.zip")
       println(counter.toString + "/" + locations.length)
       counter = counter + 1
     }
@@ -210,7 +211,8 @@ object Main {
       } else {
         upl1Name = s"${states(1)}000012010.pl"
       }
-      val writer1 = new BufferedWriter(new FileWriter(new File("datasets/2010/",file1Name), true))
+
+      val writer1 = new BufferedWriter(new FileWriter(new File("./datasets/2010/",file1Name), true))
       writer1.write(fields1)
       for (lines <- Source.fromFile(upl1Name).getLines()) {
         val writeLine = lines + "\n"
@@ -225,7 +227,7 @@ object Main {
       } else {
         upl2Name = s"${states(1)}000022010.pl"
       }
-      val writer2 = new BufferedWriter(new FileWriter(new File("datasets/2010/", file2Name), true))
+      val writer2 = new BufferedWriter(new FileWriter(new File("./datasets/2010/", file2Name), true))
       writer2.write(fields2)
       for (lines <- Source.fromFile(upl2Name).getLines()) {
         val writeLine = lines + "\n"
@@ -240,7 +242,7 @@ object Main {
       } else {
         uplName = s"${states(1)}geo2010.pl"
       }
-      val geoWriter = new BufferedWriter(new FileWriter(new File("datasets/2010/", csvName), true))
+      val geoWriter = new BufferedWriter(new FileWriter(new File("./datasets/2010/", csvName), true))
       geoWriter.write(geoHeaders)
       for (lines <- Source.fromFile(uplName)("ISO-8859-1").getLines()) {
         var splittingLine = lines
@@ -278,9 +280,9 @@ object Main {
       fileDownload(url1, "1.zip")
       fileDownload(url2, "2.zip")
 
-      unzip("datasets/geo.zip")
-      unzip("datasets/1.zip")
-      unzip("datasets/2.zip")
+      unzip("geo.zip")
+      unzip("1.zip")
+      unzip("2.zip")
 
       println(counter.toString + "/" + locations.length)
       counter = counter + 1
@@ -368,7 +370,10 @@ object Main {
     }
   } // finished
 
-  def main(args: Array[String]): Unit = {
+  def run(): Unit = {
+    Files.createDirectories(Paths.get("./datasets/2010/"))
+    Files.createDirectories(Paths.get("./datasets/2000/"))
+    Files.createDirectories(Paths.get("./datasets/2020/"))
     val t1 = System.nanoTime()
     //2D array with all folders and abbreviations for 2000 census data
     val locations = Array(
