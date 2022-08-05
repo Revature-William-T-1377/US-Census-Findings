@@ -2,7 +2,7 @@ import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SparkSession}
  import scala.collection.convert.ImplicitConversions.{`list asScalaBuffer`, `map AsJavaMap`}
- 
+
 
 object FutureTest {
   def main(args: Array[String]): Unit = {
@@ -25,19 +25,20 @@ object FutureTest {
         var year1 :Double  = years(years.size - 3)(1)
         var year2 :Double = years(years.size - 2)(1)
         var year3 :Double = years(years.size - 1)(1)
-        var growth1 = ((year2 - year1 )/ year2)
+        var growth1 = ((year2 - year1 )/ year1)
 
         println(stateCode + " population in 2000 : "+ year1 )
         println(stateCode + " population in 2010 : "+ year2 )
         println(stateCode + " population in 2020 : "+ year3 )
         println("Growth 1 is  : "+ growth1)
-        var growth2 = ((year3 - year2) / year3)
+        var growth2 = ((year3 - year2) / year2)
         println("Growth 2 is  : "+ growth2)
-        var derivative = (growth1 - growth2) // ???
+        var derivative = (growth1 - growth2)  // negative downtrends :3c
         println("Derivation is : " + derivative)
+        var growthDecay = 1- (derivative / growth1)
         var year = 2020 + (i * 10)
         println("Predicted Year is :" +year)
-        var population = years.last(1) + (years.last(1) * growth2 * derivative).toLong
+        var population =(years.last(1) * (1 + (growth2 * growthDecay))).toLong
         println("Future Population of " + stateCode + " in " + year+ "  :" + population)
         println()
 
