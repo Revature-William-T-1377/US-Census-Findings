@@ -17,26 +17,22 @@ object FutureTest {
       Array(2010, year2),
       Array(2020, year3)
       )
-
-      for(i <- 1 to 10) {
+      //calculates projected population in ten year intervals
+      for(i <- 1 to 3) {
         var year1 :Double  = years(years.size - 3)(1)
         var year2 :Double = years(years.size - 2)(1)
         var year3 :Double = years(years.size - 1)(1)
-        var growth1 = ((year2 - year1 )/ year2)
-        println(growth1)
-        var growth2 = ((year3 - year2) / year3)
-        println(growth2)
-        var derivative = (growth1 - growth2) // ???
-        println(derivative)
+        var growth1 = ((year2 - year1 )/ year1)
+        var growth2 = ((year3 - year2) / year2)
+        var derivative = (growth1 - growth2)  // negative downtrends :3c
+        var growthDecay = 1- (derivative / growth1)
         var year = 2020 + (i * 10)
-        println(year)
-        var population = years.last(1) + (years.last(1) * growth2 * derivative).toLong
-        println(population)
+        var population =(years.last(1) * (1 + (growth2 * growthDecay))).toLong
         years = years :+ Array(year, population)
       }
       years
   }
 
-  println(projection(4447100, 4779736, 5024279))
+  projection(4447100, 4779736, 5024279)
   }
 }
