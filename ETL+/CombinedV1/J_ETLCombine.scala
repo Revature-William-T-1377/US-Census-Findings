@@ -1,0 +1,241 @@
+import org.apache.spark.sql.SparkSession
+import org.apache.log4j.{Level, Logger}
+import java.io.File
+import scala.language.postfixOps
+import sys.process._
+import java.net.URL
+import java.io.{File, FileInputStream, FileOutputStream, FileWriter, InputStream, PrintWriter}
+import java.util.zip.ZipInputStream
+import org.apache.spark.sql.DataFrame
+
+// MAke sure working directory is placed and linked
+object J_ETLCombine {
+
+  var com1: DataFrame = _
+  var com2: DataFrame = _
+  var com3: DataFrame = _
+
+  def main(args: Array[String]): Unit = {
+    var t1 = System.nanoTime
+
+    val spark = SparkSession
+      .builder
+      .appName("hello hive")
+      .config("spark.master", "local[*]")
+      .enableHiveSupport()
+      .getOrCreate()
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    println("Created spark session.")
+
+    //Downloads a file given some url and file name
+    def fileDownload(url: String, fileName: String) = {
+      new URL(url) #> new File(fileName) !!
+    }
+
+    //Unzips zip files
+    def unzip(fileName: String) = {
+      val fInStream = new FileInputStream(fileName)
+      val zInString = new ZipInputStream(fInStream)
+      Stream.continually(zInString.getNextEntry).takeWhile(_ != null).foreach { file =>
+        val fout = new FileOutputStream(file.getName)
+        val buffer = new Array[Byte](1024)
+        Stream.continually(zInString.read(buffer)).takeWhile(_ != -1).foreach(fout.write(buffer, 0, _))
+      }
+    }
+
+    //2D array with all folders and abbreviations for 2000 census data
+    val locations = Array(
+      Array("Alabama", "al"),
+      Array("Alaska", "ak"),
+      Array("Arizona", "az"),
+      Array("Arkansas", "ar"),
+      Array("California", "ca"),
+      Array("Colorado", "co"),
+      Array("Connecticut", "ct"),
+      Array("Delaware", "de"),
+      Array("District_of_Columbia", "dc"),
+      Array("Florida", "fl"),
+      Array("Georgia", "ga"),
+      Array("Hawaii", "hi"),
+      Array("Idaho", "id"),
+      Array("Illinois", "il"),
+      Array("Indiana", "in"),
+      Array("Iowa", "ia"),
+      Array("Kansas", "ks"),
+      Array("Kentucky", "ky"),
+      Array("Louisiana", "la"),
+      Array("Maine", "me"),
+      Array("Maryland", "md"),
+      Array("Massachusetts", "ma"),
+      Array("Michigan", "mi"),
+      Array("Minnesota", "mn"),
+      Array("Mississippi", "ms"),
+      Array("Missouri", "mo"),
+      Array("Montana", "mt"),
+      Array("Nebraska", "ne"),
+      Array("Nevada", "nv"),
+      Array("New_Hampshire", "nh"),
+      Array("New_Jersey", "nj"),
+      Array("New_Mexico", "nm"),
+      Array("New_York", "ny"),
+      Array("North_Carolina", "nc"),
+      Array("North_Dakota", "nd"),
+      Array("Ohio", "oh"),
+      Array("Oklahoma", "ok"),
+      Array("Oregon", "or"),
+      Array("Pennsylvania", "pa"),
+      Array("Puerto_Rico", "pr"),
+      Array("Rhode_Island", "ri"),
+      Array("South_Carolina", "sc"),
+      Array("South_Dakota", "sd"),
+      Array("Tennessee", "tn"),
+      Array("Texas", "tx"),
+      Array("Utah", "ut"),
+      Array("Vermont", "vt"),
+      Array("Virginia", "va"),
+      Array("Washington", "wa"),
+      Array("West_Virginia", "wv"),
+      Array("Wisconsin", "wi"),
+      Array("Wyoming", "wy"),
+    )
+
+    val headers = spark.read.format("csv").option("header", "true").load("D:\\Revature\\DowloadDataScala\\FinalExport\\ObtainedETLDataV1\\HeaderX.csv") // CHANGE
+    headers.createOrReplaceTempView("HeaderImp")
+
+    var HeaderNames = headers.columns
+    var Headerstring = HeaderNames.mkString(",")
+    var Headerlist = Headerstring.split(",")
+
+
+    // ---------------------------------------------------Setup Done----------------------------------------------------------
+
+    // ---------------------------------------------------2000----------------------------------------------------------
+    println("---------------------------------------------------2000----------------------------------------------------------")
+    for (i <- locations) {
+      val state = i(0)
+      val abbreviation = i(1)
+      val url1 = s"https://www2.census.gov/census_2000/datasets/redistricting_file--pl_94-171/${state}/${abbreviation}00001.upl.zip"
+
+      fileDownload(url1, "1.zip")
+
+      unzip("1.zip")
+    }
+
+    for (i <- locations) {
+      val abbreviation = i(1)
+      val df = spark.read.option("delimiter", ",").csv(s"D:\\Downloads\\Work\\data\\${abbreviation}00001.upl") //Where files are dowloaded to
+      val dfhead = df.toDF(Headerlist: _*) // Same as working directory
+      J_file.outputcsv("2000", s"${abbreviation}000012000", dfhead)
+    }
+
+    // ---------------------------------------------------2010----------------------------------------------------------
+    println("---------------------------------------------------2010----------------------------------------------------------")
+    for (i <- locations) {
+      val state = i(0)
+      val abbreviation = i(1)
+      val url1 = s"https://www2.census.gov/census_2010/redistricting_file--pl_94-171/${state}/${abbreviation}2010.pl.zip"
+
+      fileDownload(url1, "1.zip")
+
+      unzip("1.zip")
+    }
+
+    for (i <- locations) {
+      val abbreviation = i(1)
+
+      val df = spark.read.option("delimiter", ",").csv(s"D:\\Downloads\\Work\\data\\${abbreviation}000012010.pl") //Where files are dowloaded to
+
+      val dfhead = df.toDF(Headerlist: _*)
+
+      J_file.outputcsv("2010", s"${abbreviation}000012010", dfhead)
+    }
+
+    // ---------------------------------------------------2020----------------------------------------------------------
+    println("---------------------------------------------------2020----------------------------------------------------------")
+    for (i <- locations) {
+      val state = i(0)
+      val abbreviation = i(1)
+      val url1 = s"https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/${state}/${abbreviation}2020.pl.zip"
+
+      fileDownload(url1, "1.zip")
+
+      unzip("1.zip")
+    }
+
+    for (i <- locations) {
+      val abbreviation = i(1)
+
+      val df = spark.read.option("delimiter", "|").csv(s"D:\\Downloads\\Work\\data\\${abbreviation}000012020.pl") //Where files are downloaded to
+
+      val dfhead = df.toDF(Headerlist: _*)
+
+      J_file.outputcsv("2020", s"${abbreviation}000012020", dfhead)
+    }
+
+    var duration = (System.nanoTime - t1)
+    println("Extracting Code Section Lasted: " + (duration / 1000000000) + " Seconds")
+
+    val t2 = System.nanoTime
+
+    val statelist = List("ak", "az", "ar", "ca", "co", "ct", "de", "dc", "fl", "ga", "hi", "id", "il", "in", "ia", "ks", "ky",
+      "la", "me", "md", "ma", "mi", "mn", "ms", "mo", "mt", "ne", "nv", "nh", "nj", "nm", "ny", "nc", "nd", "oh", "ok", "or",
+      "pa", "pr", "ri", "sc", "sd", "tn", "tx", "ut", "vt", "va", "wa", "wv", "wi", "wy")
+
+    var dfC1 = spark.read.format("csv").option("header", "true").load(s"D:\\Downloads\\Work\\data\\testing\\2000\\al000012000.csv")
+    dfC1.createOrReplaceTempView("Df1Imp")
+    var dfCL1 = spark.sql("SELECT * FROM Df1Imp LIMIT 1")
+
+    var dfC2 = spark.read.format("csv").option("header", "true").load(s"D:\\Downloads\\Work\\data\\testing\\2010\\al000012010.csv")
+    dfC2.createOrReplaceTempView("Df2Imp")
+    var dfCL2 = spark.sql("SELECT * FROM Df2Imp LIMIT 1")
+
+    var dfC3 = spark.read.format("csv").option("header", "true").load(s"D:\\Downloads\\Work\\data\\testing\\2020\\al000012020.csv")
+    dfC3.createOrReplaceTempView("Df3Imp")
+    var dfCL3 = spark.sql("SELECT * FROM Df3Imp LIMIT 1")
+
+    statelist.foreach(i => {
+
+      var dfC1 = spark.read.format("csv").option("header", "true").load(s"D:\\Downloads\\Work\\data\\testing\\2000\\${i}000012000.csv")
+      dfC1.createOrReplaceTempView("Df1Imp")
+
+      var dfCL1M = spark.sql("SELECT * FROM Df1Imp LIMIT 1")
+
+      var com1 = dfCL1.union(dfCL1M).distinct()
+      dfCL1 = com1
+    })
+
+    statelist.foreach(i => {
+
+      var dfC2 = spark.read.format("csv").option("header", "true").load(s"D:\\Downloads\\Work\\data\\testing\\2010\\${i}000012010.csv")
+      dfC2.createOrReplaceTempView("Df2Imp")
+
+      var dfCL2M = spark.sql("SELECT * FROM Df2Imp LIMIT 1")
+
+      var com2 = dfCL2.union(dfCL2M).distinct()
+      dfCL2 = com2
+    })
+
+    statelist.foreach(i => {
+
+      var dfC3 = spark.read.format("csv").option("header", "true").load(s"D:\\Downloads\\Work\\data\\testing\\2020\\${i}000012020.csv") //CSV Locations
+      dfC3.createOrReplaceTempView("Df3Imp")
+
+      var dfCL3M = spark.sql("SELECT * FROM Df3Imp LIMIT 1")
+
+      var com3 = dfCL3.union(dfCL3M).distinct()
+      dfCL3 = com3
+    })
+
+    dfCL1.coalesce(1).write.option("header", "true").csv("D:\\Revature\\DowloadDataScala\\FinalExport\\OutputCSV2\\2000") //Final output
+    dfCL2.coalesce(1).write.option("header", "true").csv("D:\\Revature\\DowloadDataScala\\FinalExport\\OutputCSV2\\2010")
+    dfCL3.coalesce(1).write.option("header", "true").csv("D:\\Revature\\DowloadDataScala\\FinalExport\\OutputCSV2\\2020")
+
+    duration = (System.nanoTime - t2)
+    println("Transforming Code Section Lasted: " + (duration / 1000000000) + " Seconds")
+
+    duration = (System.nanoTime - t1)
+    println("All Code Lasted: " + (duration / 1000000000) + " Seconds")
+
+  }
+}
+
