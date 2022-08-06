@@ -22,25 +22,13 @@ object QueryX {
     testing1.createOrReplaceTempView("Testing1Imp")
 
     val testing2 = spark.read.format("csv").option("header","true").load("D:\\Revature\\DowloadDataScala\\FinalExport\\ObtainedETLDataV1\\Combine2010RG.csv") // File location in hdfs
-    testing1.createOrReplaceTempView("Testing2Imp")
+    testing2.createOrReplaceTempView("Testing2Imp")
 
     val testing3 = spark.read.format("csv").option("header","true").load("D:\\Revature\\DowloadDataScala\\FinalExport\\ObtainedETLDataV1\\Combine2020RG.csv") // File location in hdfs
-    testing1.createOrReplaceTempView("Testing3Imp")
+    testing3.createOrReplaceTempView("Testing3Imp")
 
     val headers = spark.read.format("csv").option("header","true").load("D:\\Revature\\DowloadDataScala\\FinalExport\\ObtainedETLDataV1\\Headers.csv") // File location in hdfs
-    testing1.createOrReplaceTempView("HeaderImp")
-
-    testing1.write.mode("overwrite").saveAsTable("Testing1")
-    spark.sql("SELECT * FROM Testing1").show()
-
-    testing2.write.mode("overwrite").saveAsTable("Testing2")
-    spark.sql("SELECT * FROM Testing2").show()
-
-    testing3.write.mode("overwrite").saveAsTable("Testing3")
-    spark.sql("SELECT * FROM Testing3").show()
-
-    headers.write.mode("overwrite").saveAsTable("Headers")
-    spark.sql("SELECT * FROM Headers").show()
+    headers.createOrReplaceTempView("HeaderImp")
 
     val t1 = System.nanoTime
 
@@ -55,11 +43,11 @@ object QueryX {
     var Headerstring = HeaderNames.mkString(",")
     var Headerlist = Headerstring.split(",")
 
-    val testingE1= spark.sql(s"SELECT $Columnstring FROM Testing1")
+    val testingE1= spark.sql(s"SELECT $Columnstring FROM Testing1Imp")
 
-    val testingE2 = spark.sql(s"SELECT $Columnstring FROM Testing2")
+    val testingE2 = spark.sql(s"SELECT $Columnstring FROM Testing2Imp")
 
-    val testingE3 = spark.sql(s"SELECT $Columnstring FROM Testing3")
+    val testingE3 = spark.sql(s"SELECT $Columnstring FROM Testing3Imp")
 
     var Join1 = testingE1.union(testingE2)
 
@@ -70,7 +58,7 @@ object QueryX {
 
     for ( i <- 0 until lastimp){
 
-      var FinalTable = Join2.withColumnRenamed(s"${Columnlist(i)}",f"${Headerlist(i)}")
+      var FinalTable = Join2.withColumnRenamed(s"${Columnlist(i)}",f"${Headerlist(i).dropRight(1)}")
 
       Join2 = FinalTable
 
