@@ -8,12 +8,13 @@ import java.io.{File, FileInputStream, FileOutputStream, FileWriter, InputStream
 import java.util.zip.ZipInputStream
 import org.apache.spark.sql.DataFrame
 
-// MAke sure working directory is placed and linked
+// Make sure working directory is placed and linked D:\Downloads\Work\data
 object J_ETLCombine {
 
   var com1: DataFrame = _
   var com2: DataFrame = _
   var com3: DataFrame = _
+  var path1: String = ""
 
   def main(args: Array[String]): Unit = {
     var t1 = System.nanoTime
