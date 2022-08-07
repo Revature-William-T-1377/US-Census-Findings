@@ -1,12 +1,11 @@
 package etl
 
-import scala.language.postfixOps
-import sys.process._
+import java.io.{File, FileInputStream, FileOutputStream, FileWriter}
 import java.net.URL
-import java.io.{File, FileInputStream, FileOutputStream, FileWriter, InputStream, PrintWriter}
 import java.util.zip.ZipInputStream
 import scala.io.Source
-import util.Try
+import scala.language.postfixOps
+import scala.sys.process._
 
 object extract {
   val t1 = System.nanoTime
@@ -27,7 +26,7 @@ object extract {
     }
   }
 
-  def main(args: Array[String]): Unit = {
+  def run(): Unit = {
 
     //2D array with all folders and abbreviations for 2000 census data
     val locations = Array( Array("0US_Summary", "us"),
@@ -94,6 +93,8 @@ object extract {
       val url1 = s"https://www2.census.gov/census_2000/datasets/redistricting_file--pl_94-171/${state}/${abbreviation}00001.upl.zip"
       val url2 = s"https://www2.census.gov/census_2000/datasets/redistricting_file--pl_94-171/${state}/${abbreviation}00002.upl.zip"
 
+
+      //Files.createDirectories(Paths.get("./extract"))
       fileDownload(geoUrl, "geo.zip")
       fileDownload(url1, "1.zip")
       fileDownload(url2, "2.zip")
@@ -101,6 +102,7 @@ object extract {
       unzip("geo.zip")
       unzip("1.zip")
       unzip("2.zip")
+      //println("zip finished")
     }
 
     //sets up field names for 00001.csv and 00002.csv

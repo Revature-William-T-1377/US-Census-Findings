@@ -2,14 +2,17 @@ package queries
 
 import org.apache.spark.sql.functions.{col, lit}
 import org.apache.spark.sql.types.DecimalType
+import sparkConnector.run.{bucket, session}
+
 
 object cleaned extends App {
-  val session = sparkConnector.sparkQueries.sparkCxn()
 
-  var df1 = session.read.option("header", "true").csv("Combine2000RG.csv")
-  var df2 = session.read.option("header", "true").csv("Combine2010RG.csv")
-  var df3 = session.read.option("header", "true").csv("Combine2020RG.csv")
-  var df4 = session.read.option("header", "true").csv("headers.csv")
+
+
+  var df1 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2000RG.csv")
+  var df2 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2010RG.csv")
+  var df3 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2020RG.csv")
+  var df4 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/headers.csv")
   df1.createOrReplaceTempView("c2000")
   df2.createOrReplaceTempView("c2010")
   df3.createOrReplaceTempView("c2020")
@@ -24,7 +27,7 @@ object cleaned extends App {
   var dm2 = (dc2 zip dc4).toMap
   var dm3 = (dc3 zip dc4).toMap
   //empty data frames
-  var dfe1 = session.emptyDataFrame
+  var dfe1 = session.spark.emptyDataFrame
   //casting to int
   for (i <- dc1) {
     df1 = df1.withColumn(s"$i", col(s"$i").cast(DecimalType(38, 0)))
@@ -37,12 +40,12 @@ object cleaned extends App {
   }
   //reading data for tables
   //dfe1 = dfe1.withColumn("Data", lit("Total"))
-  var data = session.emptyDataFrame
-  var data2 = session.emptyDataFrame
+  var data = session.spark.emptyDataFrame
+  var data2 = session.spark.emptyDataFrame
   var prevc = ""
   var bool = true
   for (i <- dc1) {
-    data = session.sql(s"Select SUM($i) as " + dm1.get(i).get + " from c2000").toDF()
+    data = session.spark.sql(s"Select SUM($i) as " + dm1.get(i).get + " from c2000").toDF()
     data.withColumn("data1", lit("totalx")).show()
     prevc = data.columns(0)
     //data = data.join(data)
@@ -62,11 +65,11 @@ object cleaned extends App {
   System.exit(0)
   println("end of 2000 tables")
   for (i <- dc2) {
-    session.sql(s"Select SUM($i) as " + dm2.get(i).get + " from c2010").show(1, false)
+    session.spark.sql(s"Select SUM($i) as " + dm2.get(i).get + " from c2010").show(1, false)
   }
   println("end of 2010 tables")
   for (i <- dc3) {
-    session.sql(s"Select SUM($i) as " + dm3.get(i).get + " from c2020").show(1, false)
+    session.spark.sql(s"Select SUM($i) as " + dm3.get(i).get + " from c2020").show(1, false)
   }
   println("end of 2020 tables")
   println(dc3.mkString(","))

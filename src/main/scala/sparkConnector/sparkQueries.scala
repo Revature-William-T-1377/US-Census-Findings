@@ -14,7 +14,7 @@ object sparkQueries extends App {
     var accessKey = " "
     var secretKey = " "
 
-    val bufferedSource: BufferedSource = Source.fromFile("/home/gentooadmin/proj3/rootkey.csv")
+    val bufferedSource: BufferedSource = Source.fromFile("C:\\Resources\\rootkeyP3.csv")
     var count = 0
     for (line <- bufferedSource.getLines) {
       val Array(val1, value) = line.split("=").map(_.trim)

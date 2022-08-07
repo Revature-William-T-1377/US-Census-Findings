@@ -1,7 +1,8 @@
 package etl
 
-import etl.run.session
+
 import org.apache.spark.sql.DataFrame
+import sparkConnector.run.session
 
 object transforming extends App {
   var com1: DataFrame = _

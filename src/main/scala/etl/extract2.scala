@@ -1,12 +1,11 @@
 package etl
 
-import scala.language.postfixOps
-import sys.process._
+import java.io.{File, FileInputStream, FileOutputStream, FileWriter}
 import java.net.URL
-import java.io.{File, FileInputStream, FileOutputStream, FileWriter, InputStream, PrintWriter}
 import java.util.zip.ZipInputStream
 import scala.io.Source
-import util.Try
+import scala.language.postfixOps
+import scala.sys.process._
 
 object extract2 {
   val t1 = System.nanoTime
@@ -28,7 +27,7 @@ object extract2 {
     }
   }
 
-  def main(args: Array[String]): Unit = {
+  def run(): Unit = {
 
     //2D array with all folders and abbreviations for 2010 census data
     locations = Array( Array("Alabama", "al"),

@@ -1,40 +1,41 @@
 package queries
 
+import sparkConnector.run.{bucket, session}
+
 object QueryX extends App {
-  val bucket = "revature-william-big-data-1377" //hardcode AWS bucket name
 
   def cen_query(): Unit = {
 
-    val spark = sparkConnector.sparkQueries.sparkCxn()
+
 
     //spark.logger.info("test") /////usage of logger example
 
     //    val df = session.spark.read.format("csv").option("header", "true").load(s"s3a://$bucket/csvraw/Combine2020RG.csv") // File location in hdfs
     //    df.show()
 
-    val testing1 = spark.read.format("csv").option("header", "true").load(s"s3a://$bucket/csvraw/Combine2000RG.csv") // File location in hdfs
+    val testing1 = session.spark.read.format("csv").option("header", "true").load(s"s3a://$bucket/csvraw/Combine2000RG.csv") // File location in hdfs
     testing1.createOrReplaceTempView("Testing1Imp")
 
-    val testing2 = spark.read.format("csv").option("header", "true").load(s"s3a://$bucket/csvraw/Combine2010RG.csv") // File location in hdfs
+    val testing2 = session.spark.read.format("csv").option("header", "true").load(s"s3a://$bucket/csvraw/Combine2010RG.csv") // File location in hdfs
     testing1.createOrReplaceTempView("Testing2Imp")
 
-    val testing3 = spark.read.format("csv").option("header", "true").load(s"s3a://$bucket/csvraw/Combine2020RG.csv") // File location in hdfs
+    val testing3 = session.spark.read.format("csv").option("header", "true").load(s"s3a://$bucket/csvraw/Combine2020RG.csv") // File location in hdfs
     testing1.createOrReplaceTempView("Testing3Imp")
 
-    val headers = spark.read.format("csv").option("header", "true").load(s"s3a://$bucket/csvraw/headers.csv") // File location in hdfs
+    val headers = session.spark.read.format("csv").option("header", "true").load(s"s3a://$bucket/csvraw/headers.csv") // File location in hdfs
     testing1.createOrReplaceTempView("HeaderImp")
 
     testing1.write.mode("overwrite").saveAsTable("Testing1")
-    spark.sql("SELECT * FROM Testing1").show()
+    session.spark.sql("SELECT * FROM Testing1").show()
 
     testing2.write.mode("overwrite").saveAsTable("Testing2")
-    spark.sql("SELECT * FROM Testing2").show()
+    session.spark.sql("SELECT * FROM Testing2").show()
 
     testing3.write.mode("overwrite").saveAsTable("Testing3")
-    spark.sql("SELECT * FROM Testing3").show()
+    session.spark.sql("SELECT * FROM Testing3").show()
 
     headers.write.mode("overwrite").saveAsTable("Headers")
-    spark.sql("SELECT * FROM Headers").show()
+    session.spark.sql("SELECT * FROM Headers").show()
 
     val t1 = System.nanoTime
 
@@ -49,9 +50,9 @@ object QueryX extends App {
     var Headerstring = HeaderNames.mkString(",")
     var Headerlist = Headerstring.split(",")
 
-    val testingE1 = spark.sql(s"SELECT $Columnstring FROM Testing1")
-    val testingE2 = spark.sql(s"SELECT $Columnstring FROM Testing2")
-    val testingE3 = spark.sql(s"SELECT $Columnstring FROM Testing3")
+    val testingE1 = session.spark.sql(s"SELECT $Columnstring FROM Testing1")
+    val testingE2 = session.spark.sql(s"SELECT $Columnstring FROM Testing2")
+    val testingE3 = session.spark.sql(s"SELECT $Columnstring FROM Testing3")
 
     var Join1 = testingE1.union(testingE2)
     var Join2 = Join1.union(testingE3)
