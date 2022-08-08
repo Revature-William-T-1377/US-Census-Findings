@@ -1,0 +1,5 @@
+package unitTesting
+
+class template {
+
+}
