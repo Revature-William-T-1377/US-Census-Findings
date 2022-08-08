@@ -71,7 +71,6 @@ object FutureTest {
       val population =(years.last(1) * (1 + (growth2 * growthDecay))).toLong
       println("Future Population of " + stateCode + " in " + year+ ": " + population)
       println()
-
       years = years :+ Array(year, population)
     }
   }

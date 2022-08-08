@@ -1,6 +1,7 @@
- import org.apache.commons.io.FileUtils
+
  import org.apache.log4j.{Level, Logger}
  import org.apache.spark.sql.{DataFrame, SparkSession}
+
  import java.io.{File, FileReader, FileWriter}
  import scala.collection.convert.ImplicitConversions.{`list asScalaBuffer`, `map AsJavaMap`}
 
@@ -80,16 +81,15 @@ object FutureTestEx {
     Logger.getLogger("org").setLevel(Level.ERROR)
     println("created spark session")
 
-    var data = spark.read.option("header", "true").option("inferSchema",
-      "true").format("csv").load(
-      "Combine2000RG.csv")
+    val data = spark.read.option("header", "true").option("inferSchema",
+      "true").format("csv").load(getClass.getResource("/Combine2000RG.csv").getPath)
 
-    var data2010 = spark.read.option("header", "true").option("inferSchema",
-      "true").format("csv").load(
-      "Combine2010RG.csv")
-    var data2020 = spark.read.option("header", "true").option("inferSchema",
-      "true").format("csv").load(
-      "combine2020RG.csv")
+    val data2010 = spark.read.option("header", "true").option("inferSchema",
+      "true").format("csv").load(getClass.getResource(
+      "/Combine2010RG.csv").getPath)
+    val data2020 = spark.read.option("header", "true").option("inferSchema",
+      "true").format("csv").load(getClass.getResource(
+      "/combine2020RG.csv").getPath)
 //Creating Temp View
     data.createOrReplaceTempView("Census2000")
     data2010.createOrReplaceTempView("Census2010")
