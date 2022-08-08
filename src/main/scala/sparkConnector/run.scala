@@ -1,7 +1,7 @@
 package sparkConnector
 
 import com.amazonaws.services.s3.model.GetObjectRequest
-import etl.{andyCombinedScrapper, transforming}
+import etl.{optimizedScrapper, transforming}
 
 import java.io.File
 
@@ -10,7 +10,7 @@ object run extends App {
   val session = new sparkConnector.spark()
 
 
-  andyCombinedScrapper.run()
+  optimizedScrapper.run()
   transforming.run()
 
   session.client.putObject(bucket, "csvraw/Combine2000RG.csv", new File("./OutputCSV2/2000.csv"))

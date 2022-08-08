@@ -1,10 +1,12 @@
-import scala.language.postfixOps
-import sys.process._
+package etl
+
+import java.io._
 import java.net.URL
-import java.io.{BufferedWriter, File, FileInputStream, FileOutputStream, FileWriter, InputStream, PrintWriter}
+import java.nio.file.{Files, Paths}
 import java.util.zip.ZipInputStream
 import scala.io.Source
-import util.Try
+import scala.language.postfixOps
+import scala.sys.process._
 
 object optimizedScrapper {
   def fileDownload(url: String, fileName: String) = {
@@ -167,8 +169,12 @@ object optimizedScrapper {
 
   } // finished
 
-  def main(args: Array[String]): Unit = {
+  def run(): Unit = {
     val t1 = System.nanoTime()
+
+    Files.createDirectories(Paths.get("./datasets/2010/"))
+    Files.createDirectories(Paths.get("./datasets/2000/"))
+    Files.createDirectories(Paths.get("./datasets/2020/"))
     //2D array with all folders and abbreviations for 2000 census data
     val locations = Array(
       Array("Alabama", "al"),

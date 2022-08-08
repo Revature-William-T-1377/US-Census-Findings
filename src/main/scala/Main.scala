@@ -24,7 +24,9 @@ object Main {
     session.spark.sql(query.query3()).show()
     session.spark.sql(query.query4()).show()
     session.spark.sql(query.query5()).show()
-    session.spark.sql(query.query6()).show()
+    println("***********************************************************************************************************************")
+    session.spark.sql(query.query6()).show()//something wrong with query
+    println("***********************************************************************************************************************")
     var dfne  = session.spark.sql(query.queryNE())
     var dfne2 = dfne.withColumn("Region", lit("Northeast"))
 
@@ -116,11 +118,13 @@ object Main {
       Join2 = FinalTable
 
     }
+
     Join2.show()
 
 
-    /**********************************************************************************************************************************/
 
+
+    /**********************************************************************************************************************************/
 
     session.spark.sql(query.query1()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query1/")
     session.spark.sql(query.query2()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query2/")
