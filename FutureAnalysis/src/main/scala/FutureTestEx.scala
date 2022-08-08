@@ -1,10 +1,11 @@
  import org.apache.log4j.{Level, Logger}
  import org.apache.spark.sql.{DataFrame, SparkSession}
+
  import java.io.{File, FileReader, FileWriter}
  import scala.collection.convert.ImplicitConversions.{`list asScalaBuffer`, `map AsJavaMap`}
 
 object FutureTestEx {
-  val fileName = "D:/out/FuturePredict.csv"  //Set Export CSv path
+  val fileName = "src/main/resources/FuturePredict.csv"  //Set Export CSv path
   val mymultiarr= Array.ofDim[String](1, 7) //Create Array with State code name
 
 
@@ -80,18 +81,17 @@ object FutureTestEx {
     Logger.getLogger("org").setLevel(Level.ERROR)
     println("created spark session")
 
-    var data = spark.read.option("header", "true").option("inferSchema",
-      "true").format("csv").load(
-      "Cleaned/Combine2000RG.csv")
+    val data2000 = spark.read.option("header", "true").option("inferSchema",
+      "true").format("csv").load(getClass.getResource("/Combine2000RG.csv").getPath)
 
-    var data2010 = spark.read.option("header", "true").option("inferSchema",
-      "true").format("csv").load(
-      "Cleaned/Combine2010RG.csv")
-    var data2020 = spark.read.option("header", "true").option("inferSchema",
-      "true").format("csv").load(
-      "Cleaned/combine2020RG.csv")
+    val data2010 = spark.read.option("header", "true").option("inferSchema",
+      "true").format("csv").load(getClass.getResource(
+      "/Combine2010RG.csv").getPath)
+    val data2020 = spark.read.option("header", "true").option("inferSchema",
+      "true").format("csv").load(getClass.getResource(
+      "/combine2020RG.csv").getPath)
 //Creating Temp View
-    data.createOrReplaceTempView("Census2000")
+    data2000.createOrReplaceTempView("Census2000")
     data2010.createOrReplaceTempView("Census2010")
     data2020.createOrReplaceTempView("Census2020")
 //Join 3 Decade Population  table data
