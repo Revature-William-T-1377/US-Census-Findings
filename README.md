@@ -4,3 +4,4 @@ pop prediction 2020 https://public.tableau.com/views/2020PopulationPrediction/Sh
 fastest growing states https://public.tableau.com/views/FastestGrowingStates_16595440232810/Sheet4?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link <br>
 Decreasing population https://public.tableau.com/app/profile/sevin.hawkins/viz/DecreasingPop/Sheet1?publish=yes
 Fastest growth by Region https://public.tableau.com/app/profile/sevin.hawkins/viz/Fastestgrowthbyregion/Sheet1?publish=yes
+population by Category https://public.tableau.com/app/profile/sevin.hawkins/viz/PopulationByCategory/Sheet1
