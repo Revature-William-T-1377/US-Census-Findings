@@ -1,5 +1,0 @@
-package unitTesting
-
-class template {
-
-}
