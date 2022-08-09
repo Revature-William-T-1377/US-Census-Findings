@@ -8,7 +8,7 @@ import scala.io.Source
 import scala.language.postfixOps
 import scala.sys.process._
 
-object optimizedScrapper {
+object andyOptimizedScrapper {
   def fileDownload(url: String, fileName: String) = {
     new URL(url) #> new File("datasets/", fileName) !!
   }
