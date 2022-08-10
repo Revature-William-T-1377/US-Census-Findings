@@ -236,6 +236,18 @@ object andyOptimizedScrapper {
     extract2010(locations)
     extract2000(locations)
 
+    //deletes unused files
+    val plFiles = new File("../US-Census-Findings").listFiles.filter(_.getName.endsWith(".pl"))
+    val uplFiles = new File("../US-Census-Findings").listFiles.filter(_.getName.endsWith(".upl"))
+    val txtFiles = new File("../US-Census-Findings").listFiles.filter(_.getName.endsWith(".txt"))
+    val nplFiles = new File("../US-Census-Findings").listFiles.filter(_.getName.endsWith(".npl"))
+
+    val allFiles = plFiles ++ uplFiles ++ txtFiles ++ nplFiles
+
+    for (file <- allFiles) {
+      file.delete()
+    }
+
     val duration = (System.nanoTime - t1)
     println("Code took " + (duration/1000000000) + " Seconds")
   }
