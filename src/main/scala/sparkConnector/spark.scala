@@ -35,7 +35,7 @@ class spark (){
     .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider")
     .getOrCreate()
 
-  //spark.sparkContext.setLogLevel("ERROR")
+  spark.sparkContext.setLogLevel("ERROR")
 
   Logger.getLogger("org").setLevel(Level.OFF)
   Logger.getLogger("aka").setLevel(Level.OFF)

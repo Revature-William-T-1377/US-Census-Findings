@@ -29,12 +29,14 @@ object file {
 
   def outputcsv(name : String,newData:DataFrame): Unit =  {
 
-    val outputfile = ".\\OutputCSV2"
+    val outputfile = "./OutputCSV2"
     var filename = name + ".csv"
     var outputFileName = outputfile + "/temp_" + filename
     var mergedFileName = outputfile + "/" + filename//merged_
     var mergeFindGlob  = outputFileName
     var fileDel = outputfile + "/." + filename + ".crc"
+
+    println(outputFileName)
 
     newData.write
       .format("csv")

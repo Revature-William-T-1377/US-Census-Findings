@@ -6,13 +6,14 @@ import sparkConnector.spark
 object Main {
   def main(args: Array[String]): Unit = {
     val session = new spark()
-    var df = session.spark.read.option("header", "true").csv("C:\\Users\\Fenix Xia\\Documents\\GitHub\\US-Census-Findings\\src\\main\\scala\\queries\\Combine2020RG.csv")//2020
-    var df2 = session.spark.read.option("header", "true").csv("C:\\Users\\Fenix Xia\\Documents\\GitHub\\US-Census-Findings\\src\\main\\scala\\queries\\Combine2010RG.csv")//2010
-    var df3 = session.spark.read.option("header", "true").csv("C:\\Users\\Fenix Xia\\Documents\\GitHub\\US-Census-Findings\\src\\main\\scala\\queries\\Combine2000RG.csv")//2000
+    val bucket = "revature-william-big-data-1377"
+    var df = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2020RG.csv")//2020
+    var df2 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2010RG.csv")//2010
+    var df3 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2000RG.csv")//2000
     df = df.withColumn("p0010001", col("p0010001").cast(DecimalType(18, 1)))
     df2 = df2.withColumn("p0010001", col("p0010001").cast(DecimalType(18, 1)))
     df3 = df3.withColumn("p0010001", col("p0010001").cast(DecimalType(18, 1)))
-    var df4 = Seq("hello world")
+
     df.createOrReplaceTempView("c2020")
     df2.createOrReplaceTempView("c2010")
     df3.createOrReplaceTempView("c2000")
@@ -23,7 +24,9 @@ object Main {
     session.spark.sql(query.query3()).show()
     session.spark.sql(query.query4()).show()
     session.spark.sql(query.query5()).show()
-    session.spark.sql(query.query6()).show()
+    println("***********************************************************************************************************************")
+    session.spark.sql(query.query6()).show()//something wrong with query
+    println("***********************************************************************************************************************")
     var dfne  = session.spark.sql(query.queryNE())
     var dfne2 = dfne.withColumn("Region", lit("Northeast"))
 
@@ -68,19 +71,19 @@ object Main {
     val df2020 = session.spark.createDataFrame(session.spark.sparkContext.parallelize(data3),schema3)
     dfe3 = df2020
 
-    val testing1 = session.spark.read.format("csv").option("header","true").load("src/main/scala/queries/Combine2000RG.csv") // File location in hdfs
-    testing1.createOrReplaceTempView("Testing1Imp")
+    //val testing1 = session.spark.read.format("csv").option("header","true").load("src/main/scala/queries/Combine2000RG.csv") // File location in hdfs
+    df3.createOrReplaceTempView("Testing1Imp")
 
-    val testing2 = session.spark.read.format("csv").option("header","true").load("src/main/scala/queries/Combine2010RG.csv") // File location in hdfs
-    testing2.createOrReplaceTempView("Testing2Imp")
+    //val testing2 = session.spark.read.format("csv").option("header","true").load("src/main/scala/queries/Combine2010RG.csv") // File location in hdfs
+    df2.createOrReplaceTempView("Testing2Imp")
 
-    val testing3 = session.spark.read.format("csv").option("header","true").load("src/main/scala/queries/Combine2020RG.csv") // File location in hdfs
-    testing3.createOrReplaceTempView("Testing3Imp")
+    //val testing3 = session.spark.read.format("csv").option("header","true").load("src/main/scala/queries/Combine2020RG.csv") // File location in hdfs
+    df.createOrReplaceTempView("Testing3Imp")
 
-    val headers = session.spark.read.format("csv").option("header","true").load("src/main/scala/queries/headers.csv") // File location in hdfs
+    val headers = session.spark.read.format("csv").option("header","true").load(s"s3a://$bucket/csvraw/headers.csv") // File location in hdfs
     headers.createOrReplaceTempView("HeaderImp")
 
-    var testingS = testing1.drop("FILEID", "STUSAB", "Region", "Division", "CHARITER", "CIFSN", "LOGRECNO")
+    var testingS = df3.drop("FILEID", "STUSAB", "Region", "Division", "CHARITER", "CIFSN", "LOGRECNO")
 
     var ColumnNames = testingS.columns
     var Columnstring = ColumnNames.mkString("sum(", "),sum(", ")")
@@ -115,18 +118,20 @@ object Main {
       Join2 = FinalTable
 
     }
+
     Join2.show()
 
 
-    /**********************************************************************************************************************************/
 
+
+    /**********************************************************************************************************************************/
 
     session.spark.sql(query.query1()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query1/")
     session.spark.sql(query.query2()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query2/")
     session.spark.sql(query.query3()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query3/")
     session.spark.sql(query.query4()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query4/")
     session.spark.sql(query.query5()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query5/")
-    //session.spark.sql(query.query6()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query6/")
+    session.spark.sql(query.query6()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query6/")
     session.spark.sql(query.query6()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query6/")
     session.spark.sql(query.query7()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query7/")
     session.spark.sql(query.query8()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query8/")
