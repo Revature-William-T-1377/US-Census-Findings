@@ -6,13 +6,13 @@ import sparkConnector.spark
 object Main {
   def main(args: Array[String]): Unit = {
     val session = new spark()
-    var df = session.spark.read.option("header", "true").csv("s3a://$bucket/csvraw/Combine2020RG.csv")//2020
-    var df2 = session.spark.read.option("header", "true").csv("s3a://$bucket/csvraw/Combine2010RG.csv")//2010
-    var df3 = session.spark.read.option("header", "true").csv("s3a://$bucket/csvraw/Combine2000RG.csv")//2000
+    var df = session.spark.read.option("header", "true").csv("C:\\Users\\Fenix Xia\\Documents\\GitHub\\US-Census-Findings\\src\\main\\scala\\queries\\Combine2020RG.csv")//2020
+    var df2 = session.spark.read.option("header", "true").csv("C:\\Users\\Fenix Xia\\Documents\\GitHub\\US-Census-Findings\\src\\main\\scala\\queries\\Combine2010RG.csv")//2010
+    var df3 = session.spark.read.option("header", "true").csv("C:\\Users\\Fenix Xia\\Documents\\GitHub\\US-Census-Findings\\src\\main\\scala\\queries\\Combine2000RG.csv")//2000
     df = df.withColumn("p0010001", col("p0010001").cast(DecimalType(18, 1)))
     df2 = df2.withColumn("p0010001", col("p0010001").cast(DecimalType(18, 1)))
     df3 = df3.withColumn("p0010001", col("p0010001").cast(DecimalType(18, 1)))
-
+    var df4 = Seq("hello world")
     df.createOrReplaceTempView("c2020")
     df2.createOrReplaceTempView("c2010")
     df3.createOrReplaceTempView("c2000")
@@ -126,7 +126,7 @@ object Main {
     session.spark.sql(query.query3()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query3/")
     session.spark.sql(query.query4()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query4/")
     session.spark.sql(query.query5()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query5/")
-    session.spark.sql(query.query6()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query6/")
+    //session.spark.sql(query.query6()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query6/")
     session.spark.sql(query.query6()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query6/")
     session.spark.sql(query.query7()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query7/")
     session.spark.sql(query.query8()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query8/")
