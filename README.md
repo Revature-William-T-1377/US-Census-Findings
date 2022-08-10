@@ -7,3 +7,5 @@ Fastest growth by Region https://public.tableau.com/app/profile/sevin.hawkins/vi
 population by Category https://public.tableau.com/app/profile/sevin.hawkins/viz/PopulationByCategory/Sheet1
 
 General viz: https://public.tableau.com/app/profile/jordi.ictech
+
+population by category (updated) https://public.tableau.com/app/profile/sevin.hawkins/viz/PopulationByCategory/Sheet4?publish=yes
