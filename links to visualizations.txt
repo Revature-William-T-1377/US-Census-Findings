@@ -16,3 +16,5 @@ General Viz: https://public.tableau.com/app/profile/jordi.ictech
 Future prediction with decay Projection: https://public.tableau.com/app/profile/edwin.castano/viz/FuturePredict/Sheet1?publish=yes
 
 Future prediction with Slope projection: https://public.tableau.com/app/profile/edwin.castano/viz/FuturePredictSlope/Sheet1?publish=yes
+
+Future prediction with Slope and decay projection: https://public.tableau.com/app/profile/edwin.castano/viz/FuturePredictHybrid/Sheet1?publish=yes
