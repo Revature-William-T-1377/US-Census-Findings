@@ -1,4 +1,4 @@
-package etl
+package etl //etl package
 
 import java.io._
 import java.net.URL
@@ -8,7 +8,8 @@ import scala.io.Source
 import scala.language.postfixOps
 import scala.sys.process._
 
-object andyOptimizedScrapper {
+//Optimized Scrapper that grabs only the data necessary to run all queries, faster by about half
+object andyOptimizedScrapper { 
   def fileDownload(url: String, fileName: String) = {
     new URL(url) #> new File("datasets/", fileName) !!
   }
