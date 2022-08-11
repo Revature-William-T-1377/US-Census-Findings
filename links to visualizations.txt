@@ -12,3 +12,7 @@ Fastest growth by region
 https://public.tableau.com/app/profile/sevin.hawkins/viz/Fastestgrowthbyregion/Sheet1?publish=yes
 
 General Viz: https://public.tableau.com/app/profile/jordi.ictech
+
+Future prediction with decay Projection: https://public.tableau.com/app/profile/edwin.castano/viz/FuturePredict/Sheet1?publish=yes
+
+Future prediction with Slope projection: https://public.tableau.com/app/profile/edwin.castano/viz/FuturePredictSlope/Sheet1?publish=yes
