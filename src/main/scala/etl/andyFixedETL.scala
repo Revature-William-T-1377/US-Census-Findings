@@ -1,12 +1,10 @@
-package etl
+package etl //etl package
 
 import org.apache.spark.sql.DataFrame
 import sparkConnector.run.session
 
 import scala.language.postfixOps
 import scala.sys.process._
-
-
 
 object andyFixedETL {
   var com1: DataFrame = _
@@ -27,6 +25,7 @@ object andyFixedETL {
       "la", "me", "md", "ma", "mi", "mn", "ms", "mo", "mt", "ne", "nv", "nh", "nj", "nm", "ny", "nc", "nd", "oh", "ok", "or",
       "pa", "pr", "ri", "sc", "sd", "tn", "tx", "ut", "vt", "va", "wa", "wv", "wi", "wy")
 
+    //initialize headers
     val dfC1 = session.spark.read.format("csv").option("header", "true").load("datasets/2000/al00001.csv")
     dfC1.createOrReplaceTempView("Df1Imp")
     var dfCL1 = session.spark.sql("SELECT * FROM Df1Imp LIMIT 1")
@@ -39,6 +38,7 @@ object andyFixedETL {
     dfC3.createOrReplaceTempView("Df3Imp")
     var dfCL3 = session.spark.sql("SELECT * FROM Df3Imp LIMIT 1")
 
+    //loads first line of each state to get total population in regards to a state as well as group values
     statelist.foreach(i => {
 
       val dfC1 = session.spark.read.format("csv").option("header", "true").load(s"datasets/2000/${i}00001.csv")
@@ -76,6 +76,7 @@ object andyFixedETL {
     dfCL2.createOrReplaceTempView("preRegion2")
     dfCL3.createOrReplaceTempView("preRegion3")
 
+    //uses regions divisions csv file to add regions to each state
     val regions = session.spark.read.option("header", "true").csv("tableFiles/RegionsDivisions.csv")
     regions.createOrReplaceTempView("regionsTemp")
 
@@ -95,6 +96,7 @@ object andyFixedETL {
 //    dfCL2.coalesce(1).write.mode("overwrite").option("header", "true").csv("outputCsv/2010/")
 //    dfCL3.coalesce(1).write.mode("overwrite").option("header", "true").csv("outputCsv/2020/")
 
+    //outputs file
     file.outputcsv("Combine2000RG",dfCL1)
     file.outputcsv("Combine2010RG",dfCL2)
     file.outputcsv("Combine2020RG",dfCL3)
