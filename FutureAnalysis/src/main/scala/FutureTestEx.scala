@@ -6,10 +6,12 @@
 
 object FutureTestEx {
   val fileName = "src/main/resources/FuturePredict.csv"  //Set Export CSv path
+  val fileNameSlope = "src/main/resources/FuturePredictSlope.csv"
+  val fileNameHybrid = "src/main/resources/FuturePredictHyb.csv"
   val mymultiarr= Array.ofDim[String](1, 7) //Create Array with State code name
 
 
-  def AddHeader: Unit ={
+  def AddHeader(fileName: String): Unit ={
       val writer = new FileWriter(fileName, true)
     try {
           writer.append("StateID,2000 Decade,2010 Decade,2020 Decade,2030 Decade,2040 Decade,2050 Decade\n") // Appending each array until loop end
@@ -19,9 +21,10 @@ object FutureTestEx {
     }
   }
 
-  def ExportCSV: Unit ={  //Function for export CSv
+  def ExportCSV(file: String) : Unit ={  //Function for export CSv
       val ColumnSeparator = ","  //separate by comma for export csv
-      val writer = new FileWriter(fileName, true)
+      val writer = new FileWriter(file, true)
+
     try {
         mymultiarr.foreach{
           line =>
@@ -52,11 +55,11 @@ object FutureTestEx {
       var growth1 = ((year2 - year1 )/ year1)
 
       var growth2 = ((year3 - year2) / year2)
-       var derivative = (growth1 - growth2)  // negative downtrends :3c
-       var growthDecay = 1- (derivative / growth1)
+      var derivative = (growth1 - growth2)  // negative downtrends :3c
+      var growthDecay = 1- (derivative / growth1)
       var year = 2020 + (i * 10)
-       var population =(years.last(1) * (1 + (growth2 * growthDecay))).toLong
-       years = years :+ Array(year, population)
+      var population =(years.last(1) * (1 + (growth2 * growthDecay))).toLong
+      years = years :+ Array(year, population)
       mymultiarr(0)(i+3) = population.toString  //Adding Predicted population in FOR loop for 2030,2040,2050
 
     }
@@ -64,7 +67,7 @@ object FutureTestEx {
     mymultiarr(0)(1) = year1.toString //2nd index default 2000 population
     mymultiarr(0)(2) = year2.toString //3rd index default 2010 population
     mymultiarr(0)(3) = year3.toString //4th index default 2020 population
-    ExportCSV  //Function Called to export these outputs as CSV files
+    ExportCSV(fileName)  //Function Called to export these outputs as CSV files
 
 
   }
@@ -91,7 +94,7 @@ object FutureTestEx {
     mymultiarr(0)(1) = year1.toString //2nd index default 2000 population
     mymultiarr(0)(2) = year2.toString //3rd index default 2010 population
     mymultiarr(0)(3) = year3.toString //4th index default 2020 population
-    ExportCSV  //Function Called to export these outputs as CSV files
+    ExportCSV(fileNameSlope)  //Function Called to export these outputs as CSV files
 
 
   }
@@ -109,39 +112,43 @@ object FutureTestEx {
       var growth1 = ((year2 - year1 )/ year1)
       var growth2 = ((year3 - year2) / year2)
       var derivative = (growth1 - growth2)  // negative downtrends :3c
+      println(derivative)
       var growthDecay = 1- (derivative / growth1)
       if(derivative < 0) {
+        println("inside the if")
         growth1 = (year2 - year1)
         growth2 = (year3 - year2)
         var growth3 = ((growth1 + growth2)/2)
-        var population =(years.last(1) +growth3).toLong
+        var population =(years.last(1) + growth3).toLong
         var year = 2020 + (i * 10)
         years = years :+ Array(year, population)
+        mymultiarr(0)(i+3) = population.toString  //Adding Predicted population in FOR loop for 2030,2040,2050
       }
       else
         {
+          println("inside the else")
           var population =(years.last(1) * (1 + (growth2 * growthDecay))).toLong
           var year = 2020 + (i * 10)
           years = years :+ Array(year, population)
+          mymultiarr(0)(i+3) = population.toString  //Adding Predicted population in FOR loop for 2030,2040,2050
         }
-
-
-
-      mymultiarr(0)(i+3) = population.toString  //Adding Predicted population in FOR loop for 2030,2040,2050
-
     }
     mymultiarr(0)(0) = stateCode //First index is States Code
     mymultiarr(0)(1) = year1.toString //2nd index default 2000 population
     mymultiarr(0)(2) = year2.toString //3rd index default 2010 population
     mymultiarr(0)(3) = year3.toString //4th index default 2020 population
-    ExportCSV  //Function Called to export these outputs as CSV files
+    ExportCSV(fileNameHybrid)  //Function Called to export these outputs as CSV files
 
 
   }
   def main(args: Array[String]): Unit = {
 
     deleteFile(fileName)
-    AddHeader
+    deleteFile(fileNameSlope)
+    deleteFile(fileNameHybrid)
+    AddHeader(fileName)
+    AddHeader(fileNameSlope)
+    AddHeader(fileNameHybrid)
        val spark = SparkSession
       .builder
       .appName("FutureTest")
@@ -180,5 +187,4 @@ object FutureTestEx {
         slopeProjection(statecode(i)(0).toString, list2000(i)(0).toString.toLong, list2010(i)(0).toString.toLong, list2020(i)(0).toString.toLong)
       }
   }
-
 }
