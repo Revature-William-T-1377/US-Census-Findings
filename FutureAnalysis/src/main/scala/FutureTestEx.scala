@@ -39,7 +39,7 @@ object FutureTestEx {
     }
   }
 
-  def projection(stateCode: String, year1: Long, year2: Long, year3: Long) {
+  def decayProjection(stateCode: String, year1: Long, year2: Long, year3: Long) {
     var years = Array(
       Array(2000, year1),
       Array(2010, year2),
@@ -57,6 +57,76 @@ object FutureTestEx {
       var year = 2020 + (i * 10)
        var population =(years.last(1) * (1 + (growth2 * growthDecay))).toLong
        years = years :+ Array(year, population)
+      mymultiarr(0)(i+3) = population.toString  //Adding Predicted population in FOR loop for 2030,2040,2050
+
+    }
+    mymultiarr(0)(0) = stateCode //First index is States Code
+    mymultiarr(0)(1) = year1.toString //2nd index default 2000 population
+    mymultiarr(0)(2) = year2.toString //3rd index default 2010 population
+    mymultiarr(0)(3) = year3.toString //4th index default 2020 population
+    ExportCSV  //Function Called to export these outputs as CSV files
+
+
+  }
+  def slopeProjection(stateCode: String, year1: Long, year2: Long, year3: Long) {
+    var years = Array(
+      Array(2000, year1),
+      Array(2010, year2),
+      Array(2020, year3)
+    )
+    for(i <- 1 to 3) {
+      var year1 :Double  = years(years.size - 3)(1)
+      var year2 :Double = years(years.size - 2)(1)
+      var year3 :Double = years(years.size - 1)(1)
+      var growth1 = (year2 - year1)
+      var growth2 = (year3 - year2)
+      var growth3 = ((growth1 + growth2)/2)
+      var year = 2020 + (i * 10)
+      var population =(years.last(1) +growth3).toLong
+      years = years :+ Array(year, population)
+      mymultiarr(0)(i+3) = population.toString  //Adding Predicted population in FOR loop for 2030,2040,2050
+
+    }
+    mymultiarr(0)(0) = stateCode //First index is States Code
+    mymultiarr(0)(1) = year1.toString //2nd index default 2000 population
+    mymultiarr(0)(2) = year2.toString //3rd index default 2010 population
+    mymultiarr(0)(3) = year3.toString //4th index default 2020 population
+    ExportCSV  //Function Called to export these outputs as CSV files
+
+
+  }
+  def decayHybridProjection(stateCode: String, year1: Long, year2: Long, year3: Long) {
+    var years = Array(
+      Array(2000, year1),
+      Array(2010, year2),
+      Array(2020, year3)
+    )
+    var population = (years.last(1))
+    for(i <- 1 to 3) {
+      var year1 :Double  = years(years.size - 3)(1)
+      var year2 :Double = years(years.size - 2)(1)
+      var year3 :Double = years(years.size - 1)(1)
+      var growth1 = ((year2 - year1 )/ year1)
+      var growth2 = ((year3 - year2) / year2)
+      var derivative = (growth1 - growth2)  // negative downtrends :3c
+      var growthDecay = 1- (derivative / growth1)
+      if(derivative < 0) {
+        growth1 = (year2 - year1)
+        growth2 = (year3 - year2)
+        var growth3 = ((growth1 + growth2)/2)
+        var population =(years.last(1) +growth3).toLong
+        var year = 2020 + (i * 10)
+        years = years :+ Array(year, population)
+      }
+      else
+        {
+          var population =(years.last(1) * (1 + (growth2 * growthDecay))).toLong
+          var year = 2020 + (i * 10)
+          years = years :+ Array(year, population)
+        }
+
+
+
       mymultiarr(0)(i+3) = population.toString  //Adding Predicted population in FOR loop for 2030,2040,2050
 
     }
@@ -105,7 +175,9 @@ object FutureTestEx {
 
       for(i <- 0 to list2020.length-1) {
         //passing parameter to prediction function using loop, This example passing value of Column name "P0010001"
-        projection(statecode(i)(0).toString, list2000(i)(0).toString.toLong, list2010(i)(0).toString.toLong, list2020(i)(0).toString.toLong)
+        decayProjection(statecode(i)(0).toString, list2000(i)(0).toString.toLong, list2010(i)(0).toString.toLong, list2020(i)(0).toString.toLong)
+        decayHybridProjection(statecode(i)(0).toString, list2000(i)(0).toString.toLong, list2010(i)(0).toString.toLong, list2020(i)(0).toString.toLong)
+        slopeProjection(statecode(i)(0).toString, list2000(i)(0).toString.toLong, list2010(i)(0).toString.toLong, list2020(i)(0).toString.toLong)
       }
   }
 
