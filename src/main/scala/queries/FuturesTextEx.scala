@@ -1,0 +1,196 @@
+package queries
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.{DataFrame, SparkSession}
+
+import java.io.{File, FileReader, FileWriter}
+import scala.collection.convert.ImplicitConversions.{`list asScalaBuffer`, `map AsJavaMap`}
+
+object FutureTestEx {
+  val fileName = "src/main/scala/queries/FuturePredict.csv"  //Set Export CSv path
+  val fileNameSlope = "src/main/scala/queries/FuturePredictSlope.csv"
+  val fileNameHybrid = "src/main/scala/queries/FuturePredictHyb.csv"
+  val mymultiarr= Array.ofDim[String](1, 7) //Create Array with State code name
+
+
+  def AddHeader(fileName: String): Unit ={
+      val writer = new FileWriter(fileName, true)
+    try {
+          writer.append("StateID,2000 Decade,2010 Decade,2020 Decade,2030 Decade,2040 Decade,2050 Decade\n") // Appending each array until loop end
+    } finally {
+      writer.flush()
+      writer.close() //Close CSV Writer
+    }
+  }
+
+  def ExportCSV(file: String) : Unit ={  //Function for export CSv
+      val ColumnSeparator = ","  //separate by comma for export csv
+      val writer = new FileWriter(file, true)
+
+    try {
+        mymultiarr.foreach{
+          line =>
+            writer.append(s"${line.map(_.toString).mkString(ColumnSeparator)}\n") // Appending each array until loop end
+        }
+      } finally {
+        writer.flush()
+        writer.close() //Close CSV Writer
+      }
+}
+  def deleteFile(path: String) = {  //Check if file existing
+    val fileTemp = new File(path)
+    if (fileTemp.exists) {
+      fileTemp.delete()
+    }
+  }
+
+  def decayProjection(stateCode: String, year1: Long, year2: Long, year3: Long) {
+    var years = Array(
+      Array(2000, year1),
+      Array(2010, year2),
+      Array(2020, year3)
+    )
+    for(i <- 1 to 3) {
+      var year1 :Double  = years(years.size - 3)(1)
+      var year2 :Double = years(years.size - 2)(1)
+      var year3 :Double = years(years.size - 1)(1)
+      var growth1 = ((year2 - year1 )/ year1)
+
+      var growth2 = ((year3 - year2) / year2)
+      var derivative = (growth1 - growth2)  // negative downtrends :3c
+      var growthDecay = 1- (derivative / growth1)
+      var year = 2020 + (i * 10)
+      var population =(years.last(1) * (1 + (growth2 * growthDecay))).toLong
+      years = years :+ Array(year, population)
+      mymultiarr(0)(i+3) = population.toString  //Adding Predicted population in FOR loop for 2030,2040,2050
+
+    }
+    mymultiarr(0)(0) = stateCode //First index is States Code
+    mymultiarr(0)(1) = year1.toString //2nd index default 2000 population
+    mymultiarr(0)(2) = year2.toString //3rd index default 2010 population
+    mymultiarr(0)(3) = year3.toString //4th index default 2020 population
+    ExportCSV(fileName)  //Function Called to export these outputs as CSV files
+
+
+  }
+  def slopeProjection(stateCode: String, year1: Long, year2: Long, year3: Long) {
+    var years = Array(
+      Array(2000, year1),
+      Array(2010, year2),
+      Array(2020, year3)
+    )
+    for(i <- 1 to 3) {
+      var year1 :Double  = years(years.size - 3)(1)
+      var year2 :Double = years(years.size - 2)(1)
+      var year3 :Double = years(years.size - 1)(1)
+      var growth1 = (year2 - year1)
+      var growth2 = (year3 - year2)
+      var growth3 = ((growth1 + growth2)/2)
+      var year = 2020 + (i * 10)
+      var population =(years.last(1) +growth3).toLong
+      years = years :+ Array(year, population)
+      mymultiarr(0)(i+3) = population.toString  //Adding Predicted population in FOR loop for 2030,2040,2050
+
+    }
+    mymultiarr(0)(0) = stateCode //First index is States Code
+    mymultiarr(0)(1) = year1.toString //2nd index default 2000 population
+    mymultiarr(0)(2) = year2.toString //3rd index default 2010 population
+    mymultiarr(0)(3) = year3.toString //4th index default 2020 population
+    ExportCSV(fileNameSlope)  //Function Called to export these outputs as CSV files
+
+
+  }
+  def decayHybridProjection(stateCode: String, year1: Long, year2: Long, year3: Long) {
+    var years = Array(
+      Array(2000, year1),
+      Array(2010, year2),
+      Array(2020, year3)
+    )
+    var population = (years.last(1))
+    for(i <- 1 to 3) {
+      var year1 :Double  = years(years.size - 3)(1)
+      var year2 :Double = years(years.size - 2)(1)
+      var year3 :Double = years(years.size - 1)(1)
+      var growth1 = ((year2 - year1 )/ year1)
+      var growth2 = ((year3 - year2) / year2)
+      var derivative = (growth1 - growth2)  // negative downtrends :3c
+      // println(derivative)
+      var growthDecay = 1- (derivative / growth1)
+      if(derivative < 0) {
+        // println("inside the if")
+        growth1 = (year2 - year1)
+        growth2 = (year3 - year2)
+        var growth3 = ((growth1 + growth2)/2)
+        var population =(years.last(1) + growth3).toLong
+        var year = 2020 + (i * 10)
+        years = years :+ Array(year, population)
+        mymultiarr(0)(i+3) = population.toString  //Adding Predicted population in FOR loop for 2030,2040,2050
+      }
+      else
+        {
+          // println("inside the else")
+          var population =(years.last(1) * (1 + (growth2 * growthDecay))).toLong
+          var year = 2020 + (i * 10)
+          years = years :+ Array(year, population)
+          mymultiarr(0)(i+3) = population.toString  //Adding Predicted population in FOR loop for 2030,2040,2050
+        }
+    }
+    mymultiarr(0)(0) = stateCode //First index is States Code
+    mymultiarr(0)(1) = year1.toString //2nd index default 2000 population
+    mymultiarr(0)(2) = year2.toString //3rd index default 2010 population
+    mymultiarr(0)(3) = year3.toString //4th index default 2020 population
+    ExportCSV(fileNameHybrid)  //Function Called to export these outputs as CSV files
+
+
+  }
+
+  def main(args: Array[String]): Unit = {
+
+    deleteFile(fileName)
+    deleteFile(fileNameSlope)
+    deleteFile(fileNameHybrid)
+    AddHeader(fileName)
+    AddHeader(fileNameSlope)
+    AddHeader(fileNameHybrid)
+       val spark = SparkSession
+      .builder
+      .appName("FutureTest")
+      .config("spark.master", "local[*]")
+      .enableHiveSupport()
+      .getOrCreate()
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    println("created spark session")
+
+    // src/main/scala/queries/FuturePredictSlope.csv
+    val data2000 = spark.read.option("header", "true").option("inferSchema",
+      "true").format("csv").load("src/main/scala/queries/Combine2000RG.csv")
+
+    val data2010 = spark.read.option("header", "true").option("inferSchema",
+      "true").format("csv").load("src/main/scala/queries/Combine2010RG.csv")
+    val data2020 = spark.read.option("header", "true").option("inferSchema",
+      "true").format("csv").load("src/main/scala/queries/Combine2020RG.csv")
+//Creating Temp View
+    data2000.createOrReplaceTempView("Census2000")
+    data2010.createOrReplaceTempView("Census2010")
+    data2020.createOrReplaceTempView("Census2020")
+//Join 3 Decade Population  table data
+    var df =spark.sql(" SELECT DISTINCT(f.STUSAB) , f.P0010001  , s.P0010001  , t.P0010001" +
+      " FROM Census2000  f INNER JOIN Census2010 s ON f.STUSAB =s.STUSAB INNER JOIN Census2020 t ON s.STUSAB=t.STUSAB Order By f.STUSAB  ").toDF("STUSAB", "Pop2000", "Pop2010", "Pop2020")
+
+    var list2010=df.select("Pop2010").collectAsList()
+    var list2000=df.select("Pop2000").collectAsList()
+    var list2020=df.select("Pop2020").collectAsList()
+    var statecode=df.select("STUSAB").collectAsList()
+
+    for(i <- 0 to list2020.length-1) {
+      //passing parameter to prediction function using loop, This example passing value of Column name "P0010001"
+      decayProjection(statecode(i)(0).toString, list2000(i)(0).toString.toLong, list2010(i)(0).toString.toLong, list2020(i)(0).toString.toLong)
+      decayHybridProjection(statecode(i)(0).toString, list2000(i)(0).toString.toLong, list2010(i)(0).toString.toLong, list2020(i)(0).toString.toLong)
+      slopeProjection(statecode(i)(0).toString, list2000(i)(0).toString.toLong, list2010(i)(0).toString.toLong, list2020(i)(0).toString.toLong)
+    }
+
+    decayProjection("US", list2000.map(s => s(0).toString.toLong).sum, list2010.map(s => s(0).toString.toLong).sum, list2020.map(s => s(0).toString.toLong).sum)
+    decayHybridProjection("US", list2000.map(s => s(0).toString.toLong).sum, list2010.map(s => s(0).toString.toLong).sum, list2020.map(s => s(0).toString.toLong).sum)
+    slopeProjection("US", list2000.map(s => s(0).toString.toLong).sum, list2010.map(s => s(0).toString.toLong).sum, list2020.map(s => s(0).toString.toLong).sum)
+  }
+}
