@@ -1,13 +1,6 @@
-import J_transforming.dfCL1
 import org.apache.spark.sql.SparkSession
 import org.apache.log4j.{Level, Logger}
-
-import java.io.File
 import scala.language.postfixOps
-import sys.process._
-import java.net.URL
-import java.io.{File, FileInputStream, FileOutputStream, FileWriter, InputStream, PrintWriter}
-import java.util.zip.ZipInputStream
 import org.apache.spark.sql.DataFrame
 
 object cityanalysis {
