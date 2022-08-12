@@ -3,7 +3,7 @@ import org.apache.spark.sql.functions.{asc, col, first, lit, monotonically_incre
 import org.apache.spark.sql.types.{DecimalType, StringType, StructType}
 import org.apache.spark.sql.{Row, SaveMode}
 import sparkConnector.spark
-import splittingthe9.session
+//import splittingthe9.{half2, session}
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -52,7 +52,83 @@ object Main {
     session.spark.sql(query.query8()).show()
 
     /*************************QUERY FOR POPULATION OF DIFFERENT CATEGORIES**************************************/
+    var dse1 = session.spark.emptyDataFrame
+    var dse2 = session.spark.emptyDataFrame
+    var dse3 = session.spark.emptyDataFrame
+
+    val datas = Seq(Row("Total 2000"))
+    val schemas = new StructType()
+      .add("Year",StringType)
+    val df2000 = session.spark.createDataFrame(session.spark.sparkContext.parallelize(datas),schemas)
+    dse1 = df2000
+
+    val data2s = Seq(Row("Total 2010"))
+    val schema2s = new StructType()
+      .add("Data2010",StringType)
+    val df2010 = session.spark.createDataFrame(session.spark.sparkContext.parallelize(data2s),schema2s)
+    dse2 = df2010
+
+    val data3s = Seq(Row("Total 2020"))
+    val schema3s = new StructType()
+      .add("Data2020",StringType)
+    val df2020 = session.spark.createDataFrame(session.spark.sparkContext.parallelize(data3s),schema3s)
+    dse3 = df2020
+
+    val testing1 = session.spark.read.format("csv").option("header","true").load("src/main/scala/queries/Combine2000RG.csv") // File location in hdfs
+    testing1.createOrReplaceTempView("Testing1Imp")
+
+    val testing2 = session.spark.read.format("csv").option("header","true").load("src/main/scala/queries/Combine2010RG.csv") // File location in hdfs
+    testing2.createOrReplaceTempView("Testing2Imp")
+
+    val testing3 = session.spark.read.format("csv").option("header","true").load("src/main/scala/queries/Combine2020RG.csv") // File location in hdfs
+    testing3.createOrReplaceTempView("Testing3Imp")
+
+    val headers = session.spark.read.format("csv").option("header","true").load("src/main/scala/queries/headers.csv") // File location in hdfs
+    headers.createOrReplaceTempView("HeaderImp")
+
+    var testingS = testing1.drop("FILEID", "STUSAB", "Region", "Division", "CHARITER", "CIFSN", "LOGRECNO")
+
+    var ColumnNames = testingS.columns
+    var Columnstring = ColumnNames.mkString("sum(", "),sum(", ")")
+    var Columnstring2 = ColumnNames.mkString(",")
+    var Columnlist = Columnstring.split(",")
+
+    var HeaderNames = headers.columns
+    var Headerstring = HeaderNames.mkString(",")
+    var Headerlist = Headerstring.split(",")
+
+    var newdata1 = session.spark.sql(s"SELECT $Columnstring FROM Testing1Imp").toDF()
+    var newdata2 = session.spark.sql(s"SELECT $Columnstring FROM Testing2Imp").toDF()
+    var newdata3 = session.spark.sql(s"SELECT $Columnstring FROM Testing3Imp").toDF()
+
+    //2000
+    dse1 = dse1.join(newdata1)
+    //2010
+    dse2 = dse2.join(newdata2)
+    //2020
+    dse3 = dse3.join(newdata3)
+
+    var Joining = dse1.union(dse2)
+
+    var Joining2 = Joining.union(dse3)
+
+
+    var lastimp = Columnlist.length
+
+    for ( i <- 0 until lastimp){
+
+      var FinalTable = Joining2.withColumnRenamed(s"${Columnlist(i)}",f"${Headerlist(i).dropRight(1)}")
+      Joining2 = FinalTable
+
+    }
+    //Join2.show()
+    val df123 = Joining2
+    //df123.show()
+
+
+    /**********************************************************************************************************/
     //creating the empty dataframes for future use
+
     var dfe1 = session.spark.emptyDataFrame
     var dfe2 = session.spark.emptyDataFrame
     var dfe3 = session.spark.emptyDataFrame
@@ -60,6 +136,8 @@ object Main {
     var dfe5 = session.spark.emptyDataFrame
     var dfe6 = session.spark.emptyDataFrame
 
+    val half2 = df123.select(df123.columns.slice(73,151).map(m=>col(m)):_*)
+    half2.repartition(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("queries/half2/")
 
     //white
     val data = Seq(Row("White"))
@@ -106,7 +184,7 @@ object Main {
     dfe6 = dfe6.withColumn("id", row_number.over(windowSpec2))
 
     //creation of dataframe to pivot/transpose on while adding an id column
-    var half2ori = session.spark.read.option("header", "true").csv("./queries/half2/part-00000-56d40e52-9d66-4b46-aa41-ccdfea3cbe9b-c000.csv")
+    var half2ori = session.spark.read.option("header", "true").csv("./queries/half2/")
     val windowSpec = Window.orderBy(asc("HispanicorLatin"))
     half2ori = half2ori.withColumn("id", row_number.over(windowSpec))
 
