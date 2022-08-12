@@ -1,4 +1,4 @@
-package etl
+package etl //etl package
 
 import java.io._
 import java.net.URL
@@ -8,7 +8,8 @@ import scala.io.Source
 import scala.language.postfixOps
 import scala.sys.process._
 
-object andyOptimizedScrapper {
+//Optimized Scrapper that grabs only the data necessary to run all queries, faster by about half
+object andyOptimizedScrapper { 
   def fileDownload(url: String, fileName: String) = {
     new URL(url) #> new File("datasets/", fileName) !!
   }
@@ -235,6 +236,18 @@ object andyOptimizedScrapper {
     extract2020(locations)
     extract2010(locations)
     extract2000(locations)
+
+    //deletes unused files
+    val plFiles = new File("../US-Census-Findings").listFiles.filter(_.getName.endsWith(".pl"))
+    val uplFiles = new File("../US-Census-Findings").listFiles.filter(_.getName.endsWith(".upl"))
+    val txtFiles = new File("../US-Census-Findings").listFiles.filter(_.getName.endsWith(".txt"))
+    val nplFiles = new File("../US-Census-Findings").listFiles.filter(_.getName.endsWith(".npl"))
+
+    val allFiles = plFiles ++ uplFiles ++ txtFiles ++ nplFiles
+
+    for (file <- allFiles) {
+      file.delete()
+    }
 
     val duration = (System.nanoTime - t1)
     println("Code took " + (duration/1000000000) + " Seconds")

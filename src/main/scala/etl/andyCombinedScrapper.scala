@@ -1,4 +1,4 @@
-package etl
+package etl //packaging into an etl package
 
 import java.io._
 import java.net.URL
@@ -8,7 +8,8 @@ import scala.io.Source
 import scala.language.postfixOps
 import scala.sys.process._
 
-object andyCombinedScrapper {
+//combined data scrapper that get all data
+object andyCombinedScrapper { 
   //Downloads a file given some url and file name
   def fileDownload(url: String, fileName: String) = {
     new URL(url) #> new File(fileName) !!
@@ -27,10 +28,12 @@ object andyCombinedScrapper {
 
   def extract2020(locations: Array[Array[String]]): Unit = {
     var counter = 1
+    //loops all locations and downloads every file
     for (i <- locations) {
       val state = i(0)
       val abbreviation = i(1)
       var url = ""
+      //National Check for a different file format
       if (i(0) == "National") {
         url = s"https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/National/us2020.npl.zip"
       } else {
@@ -39,34 +42,36 @@ object andyCombinedScrapper {
 
       fileDownload(url, "2020.zip")
       unzip("2020.zip")
+      //counter to show progress
       println(counter.toString + "/" + locations.length)
       counter = counter + 1
     }
-
+    //Using a segment file to be used as a header
     val file1Name = "tableFiles/Segment1.csv"
     var fields1 = ""
     for (line <- Source.fromFile(file1Name).getLines()) {
       fields1 = line
     }
-
+    //Using a segment file to be used as a header
     val file2Name = "tableFiles/Segment2.csv"
     var fields2 = ""
     for (line <- Source.fromFile(file2Name).getLines()) {
       fields2 = line
     }
-
+    //Using a segment file to be used as a header
     val file3Name = "tableFiles/Segment3.csv"
     var fields3 = ""
     for (line <- Source.fromFile(file3Name).getLines()) {
       fields3 = line
     }
-
+    //Using a segment file to be used as a header
     val file4Name = "tableFiles/Geohead.csv"
     var fields4 = ""
     for (line <- Source.fromFile(file4Name).getLines()) {
       fields4 = line
     }
 
+    //loops all states pl files and ports all data into a written csv stored in 'datasets/2020/'
     for (states <- locations) {
       val file1Name = s"${states(1)}00001.csv"
       var pl1Name = ""
@@ -140,8 +145,9 @@ object andyCombinedScrapper {
       }
       writer4.close()
     }
-  } // finished
-
+  }
+  
+  //same code as 2020 but handling 2010 files' formats
   def extract2010(locations: Array[Array[String]]): Unit = {
 
     var counter = 1
@@ -257,7 +263,8 @@ object andyCombinedScrapper {
       geoWriter.close()
     }
   } // finished
-
+  
+  //same code as 2010 and 2020 but handling 2000's formats
   def extract2000(locations: Array[Array[String]]): Unit = {
     var counter = 1
     for (i <- locations) {
@@ -266,6 +273,7 @@ object andyCombinedScrapper {
       var geoUrl = ""
       var url1 = ""
       var url2 = ""
+      //multiple lines to deal with a different file format in which the files are stored on the us census
       if(i(0) == "National") {
         geoUrl = "https://www2.census.gov/census_2000/datasets/redistricting_file--pl_94-171/0US_Summary/usgeo.upl.zip"
         url1 = "https://www2.census.gov/census_2000/datasets/redistricting_file--pl_94-171/0US_Summary/us00001.upl.zip"
@@ -371,6 +379,7 @@ object andyCombinedScrapper {
   } // finished
 
   def run(): Unit = {
+    //creates directories before running to prevent any possible errors
     Files.createDirectories(Paths.get("./datasets/2010/"))
     Files.createDirectories(Paths.get("./datasets/2000/"))
     Files.createDirectories(Paths.get("./datasets/2020/"))
@@ -437,6 +446,6 @@ object andyCombinedScrapper {
     extract2000(locations)
 
     val duration = (System.nanoTime - t1)
-    println("Code took " + (duration/1000000000) + " Seconds")
+    println("Code took " + (duration/1000000000) + " Seconds") //prints time it took to complete the code
   }
 }
