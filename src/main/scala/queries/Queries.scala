@@ -22,12 +22,12 @@ object Queries {
   /** *****************************TRENDLINE PREDICITON************************************************** */
   def query3(): String = {
     "SELECT t1.STUSAB, pop2000, pop2010, " +
-      "ROUND(((((pop2010 - pop2000)/pop2000) * pop2010) + pop2010),1) AS pop2020Pred, pop2020 FROM " +
+      "ROUND(((((pop2010 - pop2000))) + pop2010),1) AS pop2020Pred, pop2020 FROM " +
       "(SELECT STUSAB, p0010001 AS pop2020 FROM c2020) AS t1 " +
       "INNER JOIN (SELECT STUSAB, p0010001 AS pop2010 FROM c2010) AS t2 " +
       "ON t1.STUSAB = t2.STUSAB " +
       "INNER JOIN (SELECT STUSAB, p0010001 AS pop2000 FROM c2000) AS t3 " +
-      "ON t1.STUSAB = t3.STUSAB"
+      "ON t1.STUSAB = t3.STUSAB ORDER BY pop2020Pred DESC LIMIT 15"
   }
 
   /** *****************************FASTEST GROWING STATE********************************************** */
@@ -61,7 +61,7 @@ object Queries {
       "INNER JOIN (SELECT STUSAB, p0010001 AS pop2010 FROM c2010) AS t2 " +
       "ON t1.STUSAB = t2.STUSAB " +
       "INNER JOIN (SELECT STUSAB, p0010001 AS pop2000 FROM c2000) AS t3 " +
-      "ON t1.STUSAB = t3.STUSAB"
+      "ON t1.STUSAB = t3.STUSAB ORDER BY (pop2000 + change10 + change20) DESC LIMIT 15"
   }
 
   /** **********************HIGHEST POPULATION REGION***************************** */
