@@ -1,0 +1,13 @@
+# Visualization:
+- [Total US population across the decades](https://public.tableau.com/views/TotalPopulationAcrosstheDecades/Sheet1?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link)
+- [Fastest growing states](https://public.tableau.com/views/FastestGrowingStates_16595440232810/Sheet4?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link)
+- [Fastest growing regions](https://public.tableau.com/app/profile/sevin.hawkins/viz/Fastestgrowthbyregion/Sheet2?publish=yes)
+- [Change in population by race](https://public.tableau.com/app/profile/jordi.ictech/viz/TotalByRace/Sheet1)
+- [Predicted 2020 population compared to actual 2020 population](https://public.tableau.com/app/profile/jordi.ictech/viz/PredictedvsActualValues2020/Sheet1)
+- [Population changes through the decades](https://public.tableau.com/app/profile/jordi.ictech/viz/DecadePopulationChange-Top20/Sheet1)
+- [Cities with 1,000 to 100,000 people in 2000](https://public.tableau.com/app/profile/jordi.ictech/viz/2000PopulationsBetween1000and100000/Sheet1)
+- [Cities with 1,000 to 100,000 people in 2020](https://public.tableau.com/app/profile/jordi.ictech/viz/2020PopulationsBetween1000and100000/Sheet1)
+- [Cities with over 100,000 people in 2000](https://public.tableau.com/app/profile/jordi.ictech/viz/2000Over100000Population/Sheet1)
+- [Cities with over 100,000 people in 2020](https://public.tableau.com/app/profile/jordi.ictech/viz/2020Over100000Population/Sheet1)
+- [Logistic population prediction](https://public.tableau.com/app/profile/handy.ni/viz/FuturePredictLogisticGrowth/Sheet1)
+- [slope population prediction](https://public.tableau.com/app/profile/handy.ni/viz/FuturePredictLinearGrowth/Sheet2)
