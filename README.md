@@ -12,10 +12,6 @@ on the data. Some of the questions we asked include:
   - Which states are growing the fastest?
   - What predictions about the future population can we make based on this data?
 
-## Our Process:
-
-
-
 ## What's in this Repository:
 - [OutputCSV2](https://github.com/Revature-William-T-1377/US-Census-Findings/tree/staging/OutputCSV2)
 is the folder where our data after ETL operations is stored.
