@@ -151,11 +151,30 @@ object Main {
     //initializing spark session
     val session = new spark()
 
-    //reading csvs from s3 bucket, turing into dataframe
-    val bucket = "revature-william-big-data-1377"
-    var df = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2020RG.csv")//2020
-    var df2 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2010RG.csv")//2010
-    var df3 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2000RG.csv")//2000
+    //creating initial empty dataframes
+    var df = session.spark.emptyDataFrame
+    var df2 = session.spark.emptyDataFrame
+    var df3 = session.spark.emptyDataFrame
+
+    if(args.length == 1) {
+      if (args(0) == "--cloud") {
+        //reading csvs from s3 bucket, turing into dataframe
+        val bucket = "revature-william-big-data-1377"
+        df = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2020RG.csv")//2020
+        df2 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2010RG.csv")//2010
+        df3 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2000RG.csv")//2000
+      } else {
+        println("command line argument not recognized")
+        System.exit(1)
+      }
+    } else if (args.length > 1){
+      println("too many command line arguments provided")
+      System.exit(1)
+    } else {
+      df = session.spark.read.option("header", "true").csv("./OutputCSV2/Combine2020RG.csv")
+      df2 = session.spark.read.option("header", "true").csv("./OutputCSV2/Combine2010RG.csv")
+      df3 = session.spark.read.option("header", "true").csv("./OutputCSV2/Combine2000RG.csv")
+    }
 
     //basic casting for dataframes
     df = df.withColumn("p0010001", col("p0010001").cast(DecimalType(18, 1)))
@@ -231,7 +250,7 @@ object Main {
     val headers = session.spark.read.format("csv").option("header","true").load("tableFiles/headers.csv")
     headers.createOrReplaceTempView("HeaderImp")
 
-    var testingS = df3.drop("FILEID", "STUSAB", "Region", "Division", "CHARITER", "CIFSN", "LOGRECNO")
+    var testingS = df3.drop("FILEID", "STUSAB", "Region", "Division", "CHARITER", "CIFSN", "LOGRECNO", "State")
 
     var ColumnNames = testingS.columns
     var Columnstring = ColumnNames.mkString("sum(", "),sum(", ")")
