@@ -3,7 +3,10 @@ total pop https://public.tableau.com/views/TotalPopulationAcrosstheDecades/Sheet
 fastest growing states https://public.tableau.com/views/FastestGrowingStates_16595440232810/Sheet4?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link
 
 Fastest growth by region (updated)
-https://public.tableau.com/app/profile/sevin.hawkins/viz/Fastestgrowthbyregion/Sheet2?publish=yes
+
+https://public.tableau.com/app/profile/sevin.hawkins/viz/PopofeachRegion/Sheet2
+
+https://public.tableau.com/app/profile/sevin.hawkins/viz/Fastestgrowthbyregion/Sheet1
 
 Total by Race : https://public.tableau.com/app/profile/jordi.ictech/viz/TotalByRace/Sheet1 
 
