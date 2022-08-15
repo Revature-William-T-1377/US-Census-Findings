@@ -12,7 +12,15 @@ on the data. Some of the questions we asked include:
   - Which states are growing the fastest?
   - What predictions about the future population can we make based on this data?
 
-## What's in this repository:
+## Our Process:
+
+
+
+## What's in this Repository:
+- [OutputCSV2](https://github.com/Revature-William-T-1377/US-Census-Findings/tree/staging/OutputCSV2)
+is the folder where our data after ETL operations is stored.
+- [resultCsv](https://github.com/Revature-William-T-1377/US-Census-Findings/tree/staging/resultCsv)
+is where the results of our queries are stored as csv files.
 - [src/main/scala/etl](https://github.com/Revature-William-T-1377/US-Census-Findings/tree/testing/src/main/scala/etl)
 contains all the code used for data scraping and ETL operations.
 - [src/main/scala/queries](https://github.com/Revature-William-T-1377/US-Census-Findings/tree/testing/src/main/scala/queries)
@@ -21,3 +29,5 @@ contains all the queries we ran to answer analytical questions.
 contains code used to create a spark connection as well as code for starting all scraping and etl operations.
 - [src/main/scala/Main.scala](https://github.com/Revature-William-T-1377/US-Census-Findings/blob/testing/src/main/scala/Main.scala)
 is the main scala program that runs queries and outputs the results.
+- [tableFiles](https://github.com/Revature-William-T-1377/US-Census-Findings/tree/staging/tableFiles)
+contains extra files from the US census that were used in ETL operations.
