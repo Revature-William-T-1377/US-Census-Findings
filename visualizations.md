@@ -1,7 +1,8 @@
 # Visualization:
 - [Total US population across the decades](https://public.tableau.com/views/TotalPopulationAcrosstheDecades/Sheet1?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link)
 - [Fastest growing states](https://public.tableau.com/views/FastestGrowingStates_16595440232810/Sheet4?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link)
-- [Fastest growing regions](https://public.tableau.com/app/profile/sevin.hawkins/viz/Fastestgrowthbyregion/Sheet2?publish=yes)
+- [Population of different different regions](https://public.tableau.com/app/profile/sevin.hawkins/viz/Fastestgrowthbyregion/Sheet2?publish=yes)
+- [Fastest growing regions](https://public.tableau.com/app/profile/sevin.hawkins/viz/Fastestgrowthbyregion/Sheet1?publish=yes)
 - [Change in population by race](https://public.tableau.com/app/profile/jordi.ictech/viz/TotalByRace/Sheet1)
 - [Predicted 2020 population compared to actual 2020 population](https://public.tableau.com/app/profile/jordi.ictech/viz/PredictedvsActualValues2020/Sheet1)
 - [Population changes through the decades](https://public.tableau.com/app/profile/jordi.ictech/viz/DecadePopulationChange-Top20/Sheet1)
