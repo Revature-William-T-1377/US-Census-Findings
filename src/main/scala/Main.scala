@@ -151,11 +151,30 @@ object Main {
     //initializing spark session
     val session = new spark()
 
-    //reading csvs from s3 bucket, turing into dataframe
-    val bucket = "revature-william-big-data-1377"
-    var df = session.spark.read.option("header", "true").csv(s"./OutputCSV2/Combine2020RG.csv")//2020
-    var df2 = session.spark.read.option("header", "true").csv(s"./OutputCSV2/Combine2010RG.csv")//2010
-    var df3 = session.spark.read.option("header", "true").csv(s"./OutputCSV2/Combine2000RG.csv")//2000
+    //creating initial empty dataframes
+    var df = session.spark.emptyDataFrame
+    var df2 = session.spark.emptyDataFrame
+    var df3 = session.spark.emptyDataFrame
+
+    if(args.length == 1) {
+      if (args(0) == "--cloud") {
+        //reading csvs from s3 bucket, turing into dataframe
+        val bucket = "revature-william-big-data-1377"
+        df = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2020RG.csv")//2020
+        df2 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2010RG.csv")//2010
+        df3 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2000RG.csv")//2000
+      } else {
+        println("command line argument not recognized")
+        System.exit(1)
+      }
+    } else if (args.length > 1){
+      println("too many command line arguments provided")
+      System.exit(1)
+    } else {
+      df = session.spark.read.option("header", "true").csv("./OutputCSV2/Combine2020RG.csv")
+      df2 = session.spark.read.option("header", "true").csv("./OutputCSV2/Combine2010RG.csv")
+      df3 = session.spark.read.option("header", "true").csv("./OutputCSV2/Combine2000RG.csv")
+    }
 
     //basic casting for dataframes
     df = df.withColumn("p0010001", col("p0010001").cast(DecimalType(18, 1)))
@@ -238,7 +257,6 @@ object Main {
     var Columnstring2 = ColumnNames.mkString(",")
     var Columnlist = Columnstring.split(",")
 
-
     var HeaderNames = headers.columns
     var Headerstring = HeaderNames.mkString(",")
     var Headerlist = Headerstring.split(",")
@@ -258,7 +276,6 @@ object Main {
     var Joining2 = Joining.union(dse3)
 
     var lastimp = Columnlist.length
-    Joining2.show()
 
     for ( i <- 0 until lastimp){
 
@@ -268,8 +285,7 @@ object Main {
     }
     //Join2.show()
     val df123 = Joining2
-    df123.show()
-
+    //df123.show()
 
 
     /**********************************************************************************************************/
@@ -284,8 +300,7 @@ object Main {
 
     val half2 = df123.select(df123.columns.slice(73,151).map(m=>col(m)):_*)
     half2.repartition(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("queries/half2/")
-    half2.show()
-    System.exit(0)
+
     //white
     val data = Seq(Row("White"))
     val schema = new StructType()

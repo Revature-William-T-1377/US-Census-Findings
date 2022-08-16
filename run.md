@@ -7,3 +7,5 @@
 5. Run src/main/Main.scala
    - This will perform all queries 
    - The output to these queries will be stored in the resultCsv directory
+   - By default, this program will read data that is locally stored
+   - To enable this program to read data from AWS, you must have access and secret keys and pass in "--cloud" as a command line argument
