@@ -88,9 +88,9 @@ object Queries {
   /** ****************************************POP OF SOUTHWEST************************************ */
   def querySW(): String = {
     "SELECT pop2000, pop2010, pop2020 FROM " +
-      "(SELECT SUM(p0010001) AS pop2020 FROM c2020 WHERE Division = 'West_South_Central') " +
-      "join (SELECT SUM(p0010001) AS pop2010 FROM c2010 WHERE Division = 'West_South_Central') " +
-      "join (SELECT SUM(p0010001) AS pop2000 FROM c2000 WHERE Division = 'West_South_Central')"
+      "(SELECT SUM(p0010001) AS pop2020 FROM c2020 WHERE Division = 'West South Central') " +
+      "join (SELECT SUM(p0010001) AS pop2010 FROM c2010 WHERE Division = 'West South Central') " +
+      "join (SELECT SUM(p0010001) AS pop2000 FROM c2000 WHERE Division = 'West South Central')"
   }
 
 
@@ -106,14 +106,14 @@ object Queries {
   def querySE(): String = {
     "SELECT pop2000, pop2010, pop2020 FROM" +
       "(SELECT pop2020A + pop2020B AS pop2020 FROM " +
-      "(SELECT SUM(p0010001) AS pop2020A FROM c2020 WHERE Division = 'East_South_Central') " +
-      "join (SELECT SUM(p0010001) AS pop2020B FROM c2020 WHERE Division = 'South_Atlantic')) " +
+      "(SELECT SUM(p0010001) AS pop2020A FROM c2020 WHERE Division = 'East South Central') " +
+      "join (SELECT SUM(p0010001) AS pop2020B FROM c2020 WHERE Division = 'South Atlantic')) " +
       "join (SELECT pop2010A + pop2010B AS pop2010 FROM " +
-      "(SELECT SUM(p0010001) AS pop2010A FROM c2010 WHERE Division = 'East_South_Central') " +
-      "join (SELECT SUM(p0010001) AS pop2010B FROM c2010 WHERE Division = 'South_Atlantic')) " +
+      "(SELECT SUM(p0010001) AS pop2010A FROM c2010 WHERE Division = 'East South Central') " +
+      "join (SELECT SUM(p0010001) AS pop2010B FROM c2010 WHERE Division = 'South Atlantic')) " +
       "join (SELECT pop2000A + pop2000B AS pop2000 FROM " +
-      "(SELECT SUM(p0010001) AS pop2000A FROM c2000 WHERE Division = 'East_South_Central') " +
-      "join (SELECT SUM(p0010001) AS pop2000B FROM c2000 WHERE Division = 'South_Atlantic'))"
+      "(SELECT SUM(p0010001) AS pop2000A FROM c2000 WHERE Division = 'East South Central') " +
+      "join (SELECT SUM(p0010001) AS pop2000B FROM c2000 WHERE Division = 'South Atlantic'))"
   }
 
   /** ****************************************POP OF MIDWEST************************************ */
