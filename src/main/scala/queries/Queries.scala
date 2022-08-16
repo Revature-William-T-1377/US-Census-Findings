@@ -28,7 +28,29 @@ object Queries {
       "INNER JOIN (SELECT STUSAB, p0010001 AS pop2010 FROM c2010) AS t2 " +
       "ON t1.STUSAB = t2.STUSAB " +
       "INNER JOIN (SELECT STUSAB, p0010001 AS pop2000 FROM c2000) AS t3 " +
-      "ON t1.STUSAB = t3.STUSAB"
+      "ON t1.STUSAB = t3.STUSAB ORDER BY pop2020Pred LIMIT 15"
+  }
+
+  def query31(): String = {
+    "(SELECT t1.STUSAB, pop2000, pop2010, " +
+      "ROUND(((((pop2010 - pop2000))) + pop2010),1) AS pop2020Pred, pop2020, "+
+      "(((ABS((ROUND(((((pop2010 - pop2000))) + pop2010),1) - pop2020)))/pop2020) * 100) AS difference FROM " +
+      "(SELECT STUSAB, p0010001 AS pop2020 FROM c2020) AS t1 " +
+      "INNER JOIN (SELECT STUSAB, p0010001 AS pop2010 FROM c2010) AS t2 " +
+      "ON t1.STUSAB = t2.STUSAB " +
+      "INNER JOIN (SELECT STUSAB, p0010001 AS pop2000 FROM c2000) AS t3 " +
+      "ON t1.STUSAB = t3.STUSAB ORDER BY difference LIMIT 10)"
+  }
+
+  def query32(): String = {
+    "(SELECT t1.STUSAB, pop2000, pop2010, " +
+      "ROUND(((((pop2010 - pop2000))) + pop2010),1) AS pop2020Pred, pop2020, "+
+      "(((ABS((ROUND(((((pop2010 - pop2000))) + pop2010),1) - pop2020)))/pop2020) * 100) AS difference FROM " +
+      "(SELECT STUSAB, p0010001 AS pop2020 FROM c2020) AS t1 " +
+      "INNER JOIN (SELECT STUSAB, p0010001 AS pop2010 FROM c2010) AS t2 " +
+      "ON t1.STUSAB = t2.STUSAB " +
+      "INNER JOIN (SELECT STUSAB, p0010001 AS pop2000 FROM c2000) AS t3 " +
+      "ON t1.STUSAB = t3.STUSAB ORDER BY difference DESC LIMIT 10)"
   }
 
   /** *****************************FASTEST GROWING STATE********************************************** */
@@ -88,9 +110,9 @@ object Queries {
   /** ****************************************POP OF SOUTHWEST************************************ */
   def querySW(): String = {
     "SELECT pop2000, pop2010, pop2020 FROM " +
-      "(SELECT SUM(p0010001) AS pop2020 FROM c2020 WHERE Division = 'West_South_Central') " +
-      "join (SELECT SUM(p0010001) AS pop2010 FROM c2010 WHERE Division = 'West_South_Central') " +
-      "join (SELECT SUM(p0010001) AS pop2000 FROM c2000 WHERE Division = 'West_South_Central')"
+      "(SELECT SUM(p0010001) AS pop2020 FROM c2020 WHERE Division = 'West South Central') " +
+      "join (SELECT SUM(p0010001) AS pop2010 FROM c2010 WHERE Division = 'West South Central') " +
+      "join (SELECT SUM(p0010001) AS pop2000 FROM c2000 WHERE Division = 'West South Central')"
   }
 
 
@@ -106,14 +128,14 @@ object Queries {
   def querySE(): String = {
     "SELECT pop2000, pop2010, pop2020 FROM" +
       "(SELECT pop2020A + pop2020B AS pop2020 FROM " +
-      "(SELECT SUM(p0010001) AS pop2020A FROM c2020 WHERE Division = 'East_South_Central') " +
-      "join (SELECT SUM(p0010001) AS pop2020B FROM c2020 WHERE Division = 'South_Atlantic')) " +
+      "(SELECT SUM(p0010001) AS pop2020A FROM c2020 WHERE Division = 'East South Central') " +
+      "join (SELECT SUM(p0010001) AS pop2020B FROM c2020 WHERE Division = 'South Atlantic')) " +
       "join (SELECT pop2010A + pop2010B AS pop2010 FROM " +
-      "(SELECT SUM(p0010001) AS pop2010A FROM c2010 WHERE Division = 'East_South_Central') " +
-      "join (SELECT SUM(p0010001) AS pop2010B FROM c2010 WHERE Division = 'South_Atlantic')) " +
+      "(SELECT SUM(p0010001) AS pop2010A FROM c2010 WHERE Division = 'East South Central') " +
+      "join (SELECT SUM(p0010001) AS pop2010B FROM c2010 WHERE Division = 'South Atlantic')) " +
       "join (SELECT pop2000A + pop2000B AS pop2000 FROM " +
-      "(SELECT SUM(p0010001) AS pop2000A FROM c2000 WHERE Division = 'East_South_Central') " +
-      "join (SELECT SUM(p0010001) AS pop2000B FROM c2000 WHERE Division = 'South_Atlantic'))"
+      "(SELECT SUM(p0010001) AS pop2000A FROM c2000 WHERE Division = 'East South Central') " +
+      "join (SELECT SUM(p0010001) AS pop2000B FROM c2000 WHERE Division = 'South Atlantic'))"
   }
 
   /** ****************************************POP OF MIDWEST************************************ */
