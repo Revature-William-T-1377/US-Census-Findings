@@ -2,10 +2,8 @@ import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions.{asc, col, first, lit, monotonically_increasing_id, row_number}
 import org.apache.spark.sql.types.{DecimalType, StringType, StructType}
 import org.apache.spark.sql.{Row, SaveMode}
-import sparkConnector.spark
 
 import java.io.{File, FileWriter}
-
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -13,6 +11,7 @@ import java.io.{File, FileReader, FileWriter}
 import scala.collection.convert.ImplicitConversions.{`list asScalaBuffer`, `map AsJavaMap`}
 
 object Main {
+  val spark = new sparkAWS
 
   val mymultiarr= Array.ofDim[String](1, 7) //Create Array with State code name
 
@@ -149,32 +148,38 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     //initializing spark session
-    val session = new spark()
+    val session = spark
 
     //creating initial empty dataframes
     var df = session.spark.emptyDataFrame
     var df2 = session.spark.emptyDataFrame
     var df3 = session.spark.emptyDataFrame
 
-    if(args.length == 1) {
-      if (args(0) == "--cloud") {
-        //reading csvs from s3 bucket, turing into dataframe
-        val bucket = "revature-william-big-data-1377"
-        df = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2020RG.csv")//2020
-        df2 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2010RG.csv")//2010
-        df3 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2000RG.csv")//2000
-      } else {
-        println("command line argument not recognized")
-        System.exit(1)
-      }
-    } else if (args.length > 1){
-      println("too many command line arguments provided")
-      System.exit(1)
-    } else {
-      df = session.spark.read.option("header", "true").csv("./OutputCSV2/Combine2020RG.csv")
-      df2 = session.spark.read.option("header", "true").csv("./OutputCSV2/Combine2010RG.csv")
-      df3 = session.spark.read.option("header", "true").csv("./OutputCSV2/Combine2000RG.csv")
-    }
+//    if(args.length == 1) {
+//      if (args(0) == "--cloud") {
+//        //reading csvs from s3 bucket, turing into dataframe
+//        val bucket = "revature-william-big-data-1377"
+//        df = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2020RG.csv")//2020
+//        df2 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2010RG.csv")//2010
+//        df3 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/csvraw/Combine2000RG.csv")//2000
+//      } else {
+//        println("command line argument not recognized")
+//        System.exit(1)
+//      }
+//    } else if (args.length > 1){
+//      println("too many command line arguments provided")
+//      System.exit(1)
+//    } else {
+//      df = session.spark.read.option("header", "true").csv("hdfs://debsrv:9000/user/hive/warehouse/OutputCSV2/Combine2020RG.csv")
+//      df2 = session.spark.read.option("header", "true").csv("hdfs://debsrv:9000/user/hive/warehouse/OutputCSV2/Combine2010RG.csv")
+//      df3 = session.spark.read.option("header", "true").csv("hdfs://debsrv:9000/user/hive/warehouse/OutputCSV2/Combine2000RG.csv")
+//    }
+
+
+    val bucket = "revature-william-big-data-1377"
+    df = session.spark.read.option("header", "true").csv(s"s3a://$bucket/OutputCSV2/Combine2020RG.csv") //2020
+    df2 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/OutputCSV2/Combine2010RG.csv") //2010
+    df3 = session.spark.read.option("header", "true").csv(s"s3a://$bucket/OutputCSV2/Combine2000RG.csv") //2000
 
     //basic casting for dataframes
     df = df.withColumn("p0010001", col("p0010001").cast(DecimalType(18, 1)))
@@ -251,7 +256,7 @@ object Main {
     df2.createOrReplaceTempView("Testing2Imp")
     df.createOrReplaceTempView("Testing3Imp")
 
-    val headers = session.spark.read.format("csv").option("header","true").load("tableFiles/headers.csv")
+    val headers = session.spark.read.format("csv").option("header","true").load(s"s3a://$bucket/tableFiles/headers.csv")
     headers.createOrReplaceTempView("HeaderImp")
 
     var testingS = df3.drop("FILEID", "STUSAB", "Region", "Division", "CHARITER", "CIFSN", "LOGRECNO", "State")
@@ -303,7 +308,7 @@ object Main {
     var dfe6 = session.spark.emptyDataFrame
 
     val half2 = df123.select(df123.columns.slice(73,151).map(m=>col(m)):_*)
-    half2.repartition(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("queries/half2/")
+    half2.repartition(1).write.mode(SaveMode.Overwrite).option("header", "true").csv(s"s3a://$bucket/tableFiles/queries/half2/")
 
     //white
     val data = Seq(Row("White"))
@@ -349,7 +354,7 @@ object Main {
     dfe6 = dfe6.withColumn("id", row_number.over(windowSpec2))
 
     //creation of dataframe to pivot/transpose on while adding an id column
-    var half2ori = session.spark.read.option("header", "true").csv("./queries/half2/")
+    var half2ori = session.spark.read.option("header", "true").csv(s"s3a://$bucket/tableFiles/queries/half2/")
     val windowSpec = Window.orderBy(asc("HispanicorLatin"))
     half2ori = half2ori.withColumn("id", row_number.over(windowSpec))
 
@@ -375,22 +380,22 @@ object Main {
     var dfpivot2 = dfpivot.withColumn("Id", row_number().over(Window.orderBy(monotonically_increasing_id())) - 1)
 
     //creation of race column with id column
-    val schemarace = new StructType()
-      .add("Race", StringType)
-    var dfrace = session.spark.createDataFrame(session.spark.sparkContext.emptyRDD[Row], schemarace)
-    val testlist = half2oricolumn.toList
-    val columns = Seq("HispanicorLatin",	"NotHispanicorLatin",	"Populationofonerace7",	"Whitealone7",	"BlackorAfricanAmericanalone7",	"AmericanIndianandAlaskaNativealone7",	"Asianalone7",	"NativeHawaiianandOtherPacificIslanderalone7",	"SomeOtherRacealone8",	"Populationoftwoormoreraces8",	"Populationoftworaces8",	"WhiteBlackorAfricanAmerican8",	"WhiteAmericanIndianandAlaskaNative8",	"WhiteAsian8",	"WhiteNativeHawaiianandOtherPacificIslander8",	"WhiteSomeOtherRace8",	"BlackorAfricanAmericanAmericanIndianandAlaskaNative8",	"BlackorAfricanAmericanAsian8",	"BlackorAfricanAmericanNativeHawaiianandOtherPacificIslander9",	"BlackorAfricanAmericanSomeOtherRace9",	"AmericanIndianandAlaskaNativeAsian9",	"AmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslander9",	"AmericanIndianandAlaskaNativeSomeOtherRace9",	"AsianNativeHawaiianandOtherPacificIslander9",	"AsianSomeOtherRace9",	"NativeHawaiianandOtherPacificIslanderSomeOtherRace9",	"Populationofthreeraces9",	"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNative9",	"WhiteBlackorAfricanAmericanAsian10",	"WhiteBlackorAfricanAmericanNativeHawaiianandOtherPacificIslander10",	"WhiteBlackorAfricanAmericanSomeOtherRace10",	"WhiteAmericanIndianandAlaskaNativeAsian10",	"WhiteAmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslander10",	"WhiteAmericanIndianandAlaskaNativeSomeOtherRace10"	,"WhiteAsianNativeHawaiianandOtherPacificIslander10",	"WhiteAsianSomeOtherRace10",	"WhiteNativeHawaiianandOtherPacificIslanderSomeOtherRac",	"BlackorAfricanAmericanAmericanIndianandAlaskaNativeAsian10",	"BlackorAfricanAmericanAmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslander11",	"BlackorAfricanAmericanAmericanIndianandAlaskaNativeSomeOtherRace11",	"BlackorAfricanAmericanAsianNativeHawaiianandOtherPacificIslander11",	"BlackorAfricanAmericanAsianSomeOtherRace11",	"BlackorAfricanAmericanNativeHawaiianandOtherPacificIslanderSomeOtherRace11",	"AmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslander11"	,"AmericanIndianandAlaskaNativeAsianSomeOtherRace11",	"AmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslanderSomeOtherRace11",	"AsianNativeHawaiianandOtherPacificIslanderSomeOtherRace11",	"Populationoffourraces11",	"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeAsian12",	"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslander12",	"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeSomeOtherRace12",	"WhiteBlackorAfricanAmericanAsianNativeHawaiianandOtherPacificIslander12",	"WhiteBlackorAfricanAmericanAsianSomeOtherRace12"	,"WhiteBlackorAfricanAmericanNativeHawaiianandOtherPacificIslanderSomeOtherRace12",	"WhiteAmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslander12",	"WhiteAmericanIndianandAlaskaNativeAsianSomeOtherRace12",	"WhiteAmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslanderSomeOtherRace12",	"WhiteAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace12",	"BlackorAfricanAmericanAmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslander13",	"BlackorAfricanAmericanAmericanIndianandAlaskaNativeAsianSomeOtherRace13",	"BlackorAfricanAmericanAmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslanderSomeOtherRace13",	"BlackorAfricanAmericanAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace13",	"AmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace13",	"Populationoffiveraces13",	"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslander13"	,"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeAsianSomeOtherRace13",	"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslanderSomeOtherRace13"	,"WhiteBlackorAfricanAmericanAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace13"	,"WhiteAmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace14"	,"BlackorAfricanAmericanAmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace14",	"Populationofsixraces14"	,"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace14")
-    val rdd = session.spark.sparkContext.parallelize(columns)
-    val rowRDD = rdd.map(attributes => Row(attributes))
-    val dfFromRDD3 = session.spark.createDataFrame(rowRDD,schemarace)
-
-    val dataFrame2 = dfFromRDD3.withColumn("Id", row_number().over(Window.orderBy(monotonically_increasing_id())) - 1)
-
-    //creation of splittingthe9 table for query9
-    var splittingthe9 = dataFrame2.join(dfpivot2, dataFrame2("Id") === dfpivot2("Id"), "left").drop("Id")
-
-
-    splittingthe9.createOrReplaceTempView("sp9")
+//    val schemarace = new StructType()
+//      .add("Race", StringType)
+//    var dfrace = session.spark.createDataFrame(session.spark.sparkContext.emptyRDD[Row], schemarace)
+//    val testlist = half2oricolumn.toList
+//    val columns = Seq("HispanicorLatin",	"NotHispanicorLatin",	"Populationofonerace7",	"Whitealone7",	"BlackorAfricanAmericanalone7",	"AmericanIndianandAlaskaNativealone7",	"Asianalone7",	"NativeHawaiianandOtherPacificIslanderalone7",	"SomeOtherRacealone8",	"Populationoftwoormoreraces8",	"Populationoftworaces8",	"WhiteBlackorAfricanAmerican8",	"WhiteAmericanIndianandAlaskaNative8",	"WhiteAsian8",	"WhiteNativeHawaiianandOtherPacificIslander8",	"WhiteSomeOtherRace8",	"BlackorAfricanAmericanAmericanIndianandAlaskaNative8",	"BlackorAfricanAmericanAsian8",	"BlackorAfricanAmericanNativeHawaiianandOtherPacificIslander9",	"BlackorAfricanAmericanSomeOtherRace9",	"AmericanIndianandAlaskaNativeAsian9",	"AmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslander9",	"AmericanIndianandAlaskaNativeSomeOtherRace9",	"AsianNativeHawaiianandOtherPacificIslander9",	"AsianSomeOtherRace9",	"NativeHawaiianandOtherPacificIslanderSomeOtherRace9",	"Populationofthreeraces9",	"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNative9",	"WhiteBlackorAfricanAmericanAsian10",	"WhiteBlackorAfricanAmericanNativeHawaiianandOtherPacificIslander10",	"WhiteBlackorAfricanAmericanSomeOtherRace10",	"WhiteAmericanIndianandAlaskaNativeAsian10",	"WhiteAmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslander10",	"WhiteAmericanIndianandAlaskaNativeSomeOtherRace10"	,"WhiteAsianNativeHawaiianandOtherPacificIslander10",	"WhiteAsianSomeOtherRace10",	"WhiteNativeHawaiianandOtherPacificIslanderSomeOtherRac",	"BlackorAfricanAmericanAmericanIndianandAlaskaNativeAsian10",	"BlackorAfricanAmericanAmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslander11",	"BlackorAfricanAmericanAmericanIndianandAlaskaNativeSomeOtherRace11",	"BlackorAfricanAmericanAsianNativeHawaiianandOtherPacificIslander11",	"BlackorAfricanAmericanAsianSomeOtherRace11",	"BlackorAfricanAmericanNativeHawaiianandOtherPacificIslanderSomeOtherRace11",	"AmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslander11"	,"AmericanIndianandAlaskaNativeAsianSomeOtherRace11",	"AmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslanderSomeOtherRace11",	"AsianNativeHawaiianandOtherPacificIslanderSomeOtherRace11",	"Populationoffourraces11",	"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeAsian12",	"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslander12",	"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeSomeOtherRace12",	"WhiteBlackorAfricanAmericanAsianNativeHawaiianandOtherPacificIslander12",	"WhiteBlackorAfricanAmericanAsianSomeOtherRace12"	,"WhiteBlackorAfricanAmericanNativeHawaiianandOtherPacificIslanderSomeOtherRace12",	"WhiteAmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslander12",	"WhiteAmericanIndianandAlaskaNativeAsianSomeOtherRace12",	"WhiteAmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslanderSomeOtherRace12",	"WhiteAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace12",	"BlackorAfricanAmericanAmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslander13",	"BlackorAfricanAmericanAmericanIndianandAlaskaNativeAsianSomeOtherRace13",	"BlackorAfricanAmericanAmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslanderSomeOtherRace13",	"BlackorAfricanAmericanAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace13",	"AmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace13",	"Populationoffiveraces13",	"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslander13"	,"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeAsianSomeOtherRace13",	"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeNativeHawaiianandOtherPacificIslanderSomeOtherRace13"	,"WhiteBlackorAfricanAmericanAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace13"	,"WhiteAmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace14"	,"BlackorAfricanAmericanAmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace14",	"Populationofsixraces14"	,"WhiteBlackorAfricanAmericanAmericanIndianandAlaskaNativeAsianNativeHawaiianandOtherPacificIslanderSomeOtherRace14")
+//    val rdd = session.spark.sparkContext.parallelize(columns)
+//    val rowRDD = rdd.map(attributes => Row(attributes))
+//    val dfFromRDD3 = session.spark.createDataFrame(rowRDD,schemarace)
+//
+//    val dataFrame2 = dfFromRDD3.withColumn("Id", row_number().over(Window.orderBy(monotonically_increasing_id())) - 1)
+//
+//    //creation of splittingthe9 table for query9
+//    var splittingthe9 = dataFrame2.join(dfpivot2, dataFrame2("Id") === dfpivot2("Id"), "left").drop("Id")
+//
+//
+//    splittingthe9.createOrReplaceTempView("sp9")
 
     val dfw = session.spark.sql("SELECT sum(y2000) AS pop2000, sum(y2010) AS pop2010, sum(y2020) AS pop2020 FROM sp9 WHERE Race LIKE '%White%'")
     val dfb = session.spark.sql("SELECT sum(y2000) AS pop2000, sum(y2010) AS pop2010, sum(y2020) AS pop2020 FROM sp9 WHERE Race LIKE '%Black%'")
@@ -409,37 +414,37 @@ object Main {
 
     /**********************************************************************************************************************************/
 
-    session.spark.sql(query.query1()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query1/")
-    session.spark.sql(query.query2()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query2/")
-    session.spark.sql(query.query3()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query3/")
-    q3f.coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query3ordered/")
-    session.spark.sql(query.query4()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query4/")
-    session.spark.sql(query.query5()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query5/")
-    session.spark.sql(query.query6()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query6/")
-    session.spark.sql(query.query6()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query6/")
-    session.spark.sql(query.query7()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query7/")
-    session.spark.sql(query.query8()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query8/")
-    Join2.coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv("./resultCsv/query9/")
+    session.spark.sql(query.query1()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv(s"s3a://$bucket/tableFiles/resultCsv/query1/")
+    session.spark.sql(query.query2()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv(s"s3a://$bucket/tableFiles/resultCsv/query2/")
+    session.spark.sql(query.query3()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv(s"s3a://$bucket/tableFiles/resultCsv/query3/")
+    q3f.coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv(s"s3a://$bucket/tableFiles/resultCsv/query3ordered/")
+    session.spark.sql(query.query4()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv(s"s3a://$bucket/tableFiles/resultCsv/query4/")
+    session.spark.sql(query.query5()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv(s"s3a://$bucket/tableFiles/resultCsv/query5/")
+    session.spark.sql(query.query6()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv(s"s3a://$bucket/tableFiles/resultCsv/query6/")
+    session.spark.sql(query.query6()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv(s"s3a://$bucket/tableFiles/resultCsv/query6/")
+    session.spark.sql(query.query7()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv(s"s3a://$bucket/tableFiles/resultCsv/query7/")
+    session.spark.sql(query.query8()).coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv(s"s3a://$bucket/tableFiles/resultCsv/query8/")
+    Join2.coalesce(1).write.mode(SaveMode.Overwrite).option("header", "true").csv(s"s3a://$bucket/tableFiles/resultCsv/query9/")
 
     //Code for future analysis
     val fullDf =session.spark.sql(" SELECT DISTINCT(f.STUSAB) , f.P0010001  , s.P0010001  , t.P0010001" +
       " FROM c2000  f INNER JOIN c2010 s ON f.STUSAB =s.STUSAB INNER JOIN c2020 t ON s.STUSAB=t.STUSAB Order By f.STUSAB  ").toDF("STUSAB", "Pop2000", "Pop2010", "Pop2020")
 
     //deletes files if already exists
-    deleteFile("./resultCsv/decayProjectionStates/decayProjectionStates.csv")
-    deleteFile("./resultCsv/hybridProjectionStates/hybridProjectionStates.csv")
-    deleteFile("./resultCsv/slopeProjection/slopeProjection.csv")
-    deleteFile("./resultCsv/decayProjectionUS/decayProjectionUS.csv")
-    deleteFile("./resultCsv/decayHybridProjectionUS/decayHybridProjectionUS.csv")
-    deleteFile("./resultCsv/slopeProjectionUS/slopeProjectionUS.csv")
+    deleteFile(s"s3a://$bucket/tableFiles/resultCsv/decayProjectionStates/decayProjectionStates.csv")
+    deleteFile(s"s3a://$bucket/tableFiles/resultCsv/hybridProjectionStates/hybridProjectionStates.csv")
+    deleteFile(s"s3a://$bucket/tableFiles/resultCsv/slopeProjection/slopeProjection.csv")
+    deleteFile(s"s3a://$bucket/tableFiles/resultCsv/decayProjectionUS/decayProjectionUS.csv")
+    deleteFile(s"s3a://$bucket/tableFiles/resultCsv/decayHybridProjectionUS/decayHybridProjectionUS.csv")
+    deleteFile(s"s3a://$bucket/tableFiles/resultCsv/slopeProjectionUS/slopeProjectionUS.csv")
 
     //adds the needed headers to projection files
-    AddHeader("./resultCsv/decayProjectionStates/decayProjectionStates.csv")
-    AddHeader("./resultCsv/hybridProjectionStates/hybridProjectionStates.csv")
-    AddHeader("./resultCsv/slopeProjection/slopeProjection.csv")
-    AddHeader("./resultCsv/decayProjectionUS/decayProjectionUS.csv")
-    AddHeader("./resultCsv/decayHybridProjectionUS/decayHybridProjectionUS.csv")
-    AddHeader("./resultCsv/slopeProjectionUS/slopeProjectionUS.csv")
+    AddHeader(s"s3a://$bucket/tableFiles/resultCsv/decayProjectionStates/decayProjectionStates.csv")
+    AddHeader(s"s3a://$bucket/tableFiles/resultCsv/hybridProjectionStates/hybridProjectionStates.csv")
+    AddHeader(s"s3a://$bucket/tableFiles/resultCsv/slopeProjection/slopeProjection.csv")
+    AddHeader(s"s3a://$bucket/tableFiles/resultCsv/decayProjectionUS/decayProjectionUS.csv")
+    AddHeader(s"s3a://$bucket/tableFiles/resultCsv/decayHybridProjectionUS/decayHybridProjectionUS.csv")
+    AddHeader(s"s3a://$bucket/tableFiles/resultCsv/slopeProjectionUS/slopeProjectionUS.csv")
 
     //gets populations as lists
     val list2010=fullDf.select("Pop2010").collectAsList()
@@ -455,22 +460,22 @@ object Main {
       val pop2020Formatted = list2020(i)(0).toString.substring(0, list2020(i)(0).toString.length()-2).toLong
 
       //passing parameter to prediction function using loop, This example passing value of Column name "P0010001"
-      decayProjection(statecode(i)(0).toString, pop2000Formatted, pop2010Formatted, pop2020Formatted, "./resultCsv/decayProjectionStates/decayProjectionStates.csv")
-      decayHybridProjection(statecode(i)(0).toString, pop2000Formatted, pop2010Formatted, pop2020Formatted, "./resultCsv/hybridProjectionStates/hybridProjectionStates.csv")
-      slopeProjection(statecode(i)(0).toString, pop2000Formatted, pop2010Formatted, pop2020Formatted, "./resultCsv/slopeProjection/slopeProjection.csv")
+      decayProjection(statecode(i)(0).toString, pop2000Formatted, pop2010Formatted, pop2020Formatted, s"s3a://$bucket/tableFiles/resultCsv/decayProjectionStates/decayProjectionStates.csv")
+      decayHybridProjection(statecode(i)(0).toString, pop2000Formatted, pop2010Formatted, pop2020Formatted, s"s3a://$bucket/tableFiles/resultCsv/hybridProjectionStates/hybridProjectionStates.csv")
+      slopeProjection(statecode(i)(0).toString, pop2000Formatted, pop2010Formatted, pop2020Formatted, s"s3a://$bucket/tableFiles/resultCsv/slopeProjection/slopeProjection.csv")
     }
 
     //creates population projection for the US
-    val yearsDf = session.spark.read.option("header", "true").csv("./resultCsv/query1")
+    val yearsDf = session.spark.read.option("header", "true").csv(s"s3a://$bucket/tableFiles/resultCsv/query1")
     val totalPopList = yearsDf.collectAsList()
 
     val USpop2000Formatted = totalPopList(0)(0).toString().substring(0, totalPopList(0)(0).toString.length()-2).toLong
     val USpop2010Formatted = totalPopList(0)(1).toString().substring(0, totalPopList(0)(1).toString.length()-2).toLong
     val USpop2020Formatted = totalPopList(0)(2).toString().substring(0, totalPopList(0)(2).toString.length()-2).toLong
 
-    decayProjection("US", USpop2000Formatted, USpop2010Formatted, USpop2020Formatted, "./resultCsv/decayProjectionUS/decayProjectionUS.csv")
-    decayHybridProjection("US", USpop2000Formatted, USpop2010Formatted, USpop2020Formatted, "./resultCsv/decayHybridProjectionUS/decayHybridProjectionUS.csv")
-    slopeProjection("US", USpop2000Formatted, USpop2010Formatted, USpop2020Formatted, "./resultCsv/slopeProjectionUS/slopeProjectionUS.csv")
+    decayProjection("US", USpop2000Formatted, USpop2010Formatted, USpop2020Formatted, s"s3a://$bucket/tableFiles/resultCsv/decayProjectionUS/decayProjectionUS.csv")
+    decayHybridProjection("US", USpop2000Formatted, USpop2010Formatted, USpop2020Formatted, s"s3a://$bucket/tableFiles/resultCsv/decayHybridProjectionUS/decayHybridProjectionUS.csv")
+    slopeProjection("US", USpop2000Formatted, USpop2010Formatted, USpop2020Formatted, s"s3a://$bucket/resultCsv/slopeProjectionUS/slopeProjectionUS.csv")
 
   }
 }
