@@ -1,0 +1,81 @@
+"DESC,C,80","NAME,C,23","LEN,N,20,5"
+File Identification,FILEID,6.00000
+State/US-Abbreviation (USPS),STUSAB,2.00000
+Summary Level,SUMLEV,3.00000
+Geographic Component,GEOCOMP,2.00000
+Characteristic Iteration,CHARITER,3.00000
+Characteristic Iteration File Sequence Number,CIFSN,2.00000
+Logical Record Number,LOGRECNO,7.00000
+Region,REGION,1.00000
+Division,DIVISION,1.00000
+State (Census),STATECE,2.00000
+State (FIPS),STATE,2.00000
+County,COUNTY,3.00000
+County Size Code,COUNTYSC,2.00000
+County Subdivision (FIPS),COUSUB,5.00000
+FIPS County Subdivision Class Code,COUSUBCC,2.00000
+County Subdivision Size Code,COUSUBSC,2.00000
+Place (FIPS),PLACE,5.00000
+FIPS Place Class Code,PLACECC,2.00000
+Place Description Code,PLACEDC,1.00000
+Place Size Code,PLACESC,2.00000
+Census Tract,TRACT,6.00000
+Block Group,BLKGRP,1.00000
+Block,BLOCK,4.00000
+Internal Use Code,IUC,2.00000
+Consolidated City (FIPS),CONCIT,5.00000
+FIPS Consolidated City Class Code,CONCITCC,2.00000
+Consolidated City Size Code,CONCITSC,2.00000
+American Indian Area/Alaska Native Area/Hawaiian Home Land (Census),AIANHH,4.00000
+American Indian Area/Alaska Native Area/Hawaiian Home Land (FIPS),AIANHHFP,5.00000
+FIPS American Indian Area/Alaska Native Area/Hawaiian Home Land Class Code,AIANHHCC,2.00000
+American Indian Trust Land/Hawaiian Home Land Indicator,AIHHTLI,1.00000
+American Indian Tribal Subdivision (Census),AITSCE,3.00000
+American Indian Tribal Subdivision (FIPS),AITS,5.00000
+FIPS American Indian Tribal Subdivision Class Code,AITSCC,2.00000
+Alaska Native Regional Corporation (FIPS),ANRC,5.00000
+FIPS Alaska Native Regional Corporation Class Code,ANRCCC,2.00000
+Metropolitan Statistical Area/Consolidated Metropolitan Statistical Area,MSACMSA,4.00000
+MSA/CMSA Size Code,MASC,2.00000
+Consolidated Metropolitan Statistical Area,CMSA,2.00000
+Metropolitan Area Central City Indicator,MACCI,1.00000
+Primary Metropolitan Statistical Area,PMSA,4.00000
+New England County Metropolitan Area,NECMA,4.00000
+New England County Metropolitan Area Central City Indicator,NECMACCI,1.00000
+New England County Metropolitan Area Size Code,NECMASC,2.00000
+Extended Place Indicator,EXI,1.00000
+Urban Area,UA,5.00000
+Urban Area Size Code,UASC,2.00000
+Urban Area Type,UATYPE,1.00000
+Urban/Rural,UR,1.00000
+Congressional District (106th),CD106,2.00000
+Congressional District (108th),CD108,2.00000
+Congressional District (109th),CD109,2.00000
+Congressional District (110th),CD110,2.00000
+State Legislative District (Upper Chamber),SLDU,3.00000
+State Legislative District (Lower Chamber),SLDL,3.00000
+Voting District,VTD,6.00000
+Voting District Indicator,VTDI,1.00000
+ZIP Code Tabulation Area (3 digit),ZCTA3,3.00000
+ZIP Code Tabulation Area (5 digit),ZCTA5,5.00000
+Subbarrio (FIPS),SUBMCD,5.00000
+FIPS Subbarrio Class Code,SUBMCDCC,2.00000
+Area (Land),AREALAND,14.00000
+Area (Water),AREAWATR,14.00000
+Area Name-Legal/Statistical Area Description (LSAD) Term-Part Indicator,NAME,90.00000
+Functional Status Code,FUNCSTAT,1.00000
+Geographic Change User Note Indicator,GCUNI,1.00000
+Population Count (100%),POP100,9.00000
+Reserved,RES,9.00000
+Internal Point (Latitude),INTPTLAT,9.00000
+Internal Point (Longitude),INTPTLON,10.00000
+Legal/Statistical Area Description Code,LSADC,2.00000
+Part Flag,PARTFLAG,1.00000
+School District (Elementary),SDELM,5.00000
+School District (Secondary),SDSEC,5.00000
+School District (Unified),SDUNI,5.00000
+Traffic Analysis Zone,TAZ,6.00000
+Oregon Urban Growth Area,UGA,5.00000
+Public Use Microdata Area - 5% File,PUMA5,5.00000
+Public Use Microdata Area - 1% File,PUMA1,5.00000
+Reserved,RESERVED,32.00000
