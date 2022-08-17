@@ -32,8 +32,6 @@ class spark (){
     .config("spark.memory.offHeap.size", "2048M")
     .config("spark.executor.memory", "2g")
     .config("spark.driver.allowMultipleContexts", "true")
-    .config("spark.jars", "hadoop-aws")
-    .config("spark.jars", "aws-java-sdk-bundle")
 
     .config("spark.hadoop.fs.s3a.access.key", accessKey)
     .config("spark.hadoop.fs.s3a.secret.key", secretKey)
